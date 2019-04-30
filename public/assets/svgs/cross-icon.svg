@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="master-artboard" viewBox="0 0 83.91678619384766 83.91678619384766" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" style="enable-background:new 0 0 1400 980;" width="83.91678619384766px" height="83.91678619384766px"><defs><style id="ee-google-fonts">@import url(https://fonts.googleapis.com/css?family=Anton:400|Roboto+Slab:100,300,400,700);</style><path id="text-path-0" d="M 778.8464965820312 213.4612274169922 A 100 18 0 0 1 988.3533935546875 213.4612274169922 A 100 18 0 0 1 778.8464965820312 213.4612274169922 Z" style="fill: none; stroke: red; stroke-width: 2;"/><path id="text-path-1" d="M 664.5464477539062 37.96122741699219 A 100 19 0 0 1 876.5812377929688 37.96122741699219 A 100 19 0 0 1 664.5464477539062 37.96122741699219" style="fill: none; stroke: red; stroke-width: 2;"/><path id="text-path-2" d="M 765.3650512695312 211.70851135253906 A 100 17 0 0 1 991.5017700195312 211.70851135253906 A 100 17 0 0 1 765.3650512695312 211.70851135253906" style="fill: none; stroke: red; stroke-width: 2;"/><path id="path-1" d="M 765.3650512695312 211.70851135253906 A 100 17 0 0 1 991.5017700195312 211.70851135253906 A 100 17 0 0 1 765.3650512695312 211.70851135253906" style="fill: none; stroke: red; stroke-width: 2;"/><radialGradient id="gradient-0" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" style="stop-color: #43a048"/>
+                <stop offset="1" style="stop-color: #255827"/>
+              </radialGradient><radialGradient id="gradient-1" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" style="stop-color: #43a048"/>
+                <stop offset="1" style="stop-color: #255827"/>
+              </radialGradient><radialGradient id="gradient-2" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" style="stop-color: #43a048"/>
+                <stop offset="1" style="stop-color: #255827"/>
+              </radialGradient><radialGradient id="gradient-3" gradientUnits="objectBoundingBox" cx="0.9209831357002258" cy="60.079219818115234" r="0.5" gradientTransform="matrix(-0.3707597760368928, 0.7077026385652456, -0.010629348406523409, -0.005568092566154981, 0.7588082571728463, 0.24127137857787906)">
+                
+                <stop offset="1" style="stop-color: #000000"/>
+              </radialGradient><radialGradient id="gradient-4" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" style="stop-color: #43a048"/>
+                <stop offset="1" style="stop-color: #255827"/>
+              </radialGradient><radialGradient id="gradient-5" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" style="stop-color: #43a048"/>
+                <stop offset="1" style="stop-color: #255827"/>
+              </radialGradient><radialGradient id="gradient-6" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" style="stop-color: #43a048"/>
+                <stop offset="1" style="stop-color: #255827"/>
+              </radialGradient><radialGradient id="gradient-7" gradientUnits="objectBoundingBox" cx="0.9209831357002258" cy="60.079219818115234" r="0.5" gradientTransform="matrix(-0.3707597760368928, 0.7077026385652456, -0.010629348406523409, -0.005568092566154981, 0.7588082571728463, 0.24127137857787906)">
+                
+                <stop offset="1" style="stop-color: #000000"/>
+              </radialGradient></defs><rect id="ee-background" x="0" y="0" width="83.91678619384766" height="83.91678619384766" style="fill: white; fill-opacity: 0; pointer-events: none;"/>
+
+
+<g transform="matrix(0.7239118067095065, -0.7332235784625863, 0.03206618968599883, 0.03286431012672587, -39.23486747210988, 117.46450561303556)"><g id="g-3" transform="matrix(1, 0, 0, 1, 0, 0)">
+	<g id="g-4">
+		<path class="st0" d="M58,49h100v100H58V49z" style="fill: rgb(94, 89, 89);"/>
+	</g>
+</g></g><g transform="matrix(0.7179803451768172, 0.7392527052361121, -0.03232983721202441, 0.03259476401840944, -32.02230508876383, -41.61072999703319)"><g id="g-1" transform="matrix(1, 0, 0, 1, 0, 0)">
+	<g id="g-2">
+		<path class="st0" d="M58,49h100v100H58V49z" style="fill: rgb(94, 89, 89);"/>
+	</g>
+</g></g></svg>
