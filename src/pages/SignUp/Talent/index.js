@@ -28,6 +28,8 @@ import { reset } from '../../../reducers'
 import * as Validate from '../../../constants/validate'
 import { GoogleLogin } from 'react-google-login';
 import FacebookLogin from 'react-facebook-login';
+// import LinkedIn from 'react-linkedin-login';
+import LinkedIn from "linkedin-login-for-react";
 
 const styles = {
     floatingLabelStyle: {
@@ -160,6 +162,17 @@ class SignUp extends Component {
         console.log("Failure");
         console.error(err)
     }
+    callbackLinkedIn = (error, code, redirectUri) => {
+        if (error) {
+          // signin failed
+          console.log(error);
+        } else {
+            console.log(code);
+            console.log(redirectUri);
+          // Obtain authorization token from linkedin api
+          // see https://developer.linkedin.com/docs/oauth2 for more info
+        }
+      };
     render() {
         const { isEmail, isPassword, isConfirmPassword, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state             
         return (
@@ -176,11 +189,16 @@ class SignUp extends Component {
                         cookiePolicy={'single_host_origin'}
                     />
                     <FacebookLogin
-                        appId="5d42ec1881a56b3502c025c0d23c08d5"
+                        appId="353197588660922"
                         autoLoad={true}
                         fields="name,email,picture"
                         // onClick={componentClicked}
                         callback={responseFacebook} 
+                    />
+                     <LinkedIn
+                        clientId="81rg1g83flx6m5"
+                        callback={this.callbackLinkedIn}
+                        text="Login With LinkedIn"
                     />
                     {/* <SocialButtons
                     provider='google'
