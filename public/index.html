@@ -45,7 +45,7 @@
         width: 400px;
         font-size: 25px;
         border-radius: 50px;
-        background-color: #2276b5;
+        background-color: transparent;
       }
       .linKDN>button{
         width: 100%;
@@ -55,10 +55,41 @@
         background-color: #2276b5;
         color: #FFF;
         border: none;
+        font-family: 'NudistaLight';
+      -webkit-font-smoothing: antialiased;
+      font-weight: 700;
       }
       .linKDN>button:hover{
         cursor: pointer;
       }
+      @media (max-width: 1023px)
+    {
+    /* .linKDN {
+        font-size: 3.0vw;
+        height: 60px;
+        width: 39vw;
+        margin: 0 2vw;
+    } */
+    .linKDN>button {
+        font-size: 3.0vw;
+        height: 60px;
+        width: 39vw;
+        margin: 0 2vw;
+    }
+  }
+      @media (max-width: 767px)
+       {   
+      /* .linKDN {
+          font-size: 20px;
+          width: 350px;
+          margin-bottom: 30px;
+      } */
+      .linKDN>button {
+          font-size: 20px;
+          width: 350px;
+          margin-bottom: 30px;
+      }
+    }
 </style>
   </head>
   <body>

@@ -210,7 +210,7 @@ class SignUp extends Component {
                         <LinkedIn
                             clientId="81rg1g83flx6m5"
                             callback={this.callbackLinkedIn}
-                            text="Login With LinkedIn"
+                            text="Sign up With LinkedIn"
                             img={Images.google}
                             alt={'linkedIn'}
                         >
