@@ -59,6 +59,12 @@ const responseGoogle = (response) => {
   const responseFacebook = (response) => {
     console.log(response);
   }
+  const spanStyle ={
+      display:'flex'
+  }
+  const pStyle ={
+      fontFamily:'NudistaLight'
+  }
   
 class SignUp extends Component {
     constructor(props){
@@ -77,6 +83,8 @@ class SignUp extends Component {
     }
 
     componentWillMount() {
+        // this.props.dispatch(getExternalLogins());
+        this.props.actions.getExternalLogins();
         if(this.props.isLoggedIn){
             browserHistory.push('/profile/talent/candidate')
         }
@@ -86,6 +94,7 @@ class SignUp extends Component {
         if (!this.props.hasExternalLogins) {
             // Request external login providers
             this.props.actions.getExternalLogins();
+            // this.props.dispatch(getExternalLogins());
         }
         console.log('SignUp:componentDidMount');
     }
@@ -106,19 +115,19 @@ class SignUp extends Component {
         if (name === 'profileLink') {
             this.setState({ isProfileLink: Validate.socialValidate(value)})
         }
-        if (name === 'password') {
-            this.setState({ isPassword: Validate.passwordValidate(value)})
-        }
-        if (name === 'confirmPassword') {
-            this.setState({ isConfirmPassword: Validate.confirmPasswordValidate(value, this.state.password)})
-        }
+        // if (name === 'password') {
+        //     this.setState({ isPassword: Validate.passwordValidate(value)})
+        // }
+        // if (name === 'confirmPassword') {
+        //     this.setState({ isConfirmPassword: Validate.confirmPasswordValidate(value, this.state.password)})
+        // }
         e.preventDefault()
     }
 
     handleSignUp = () => {                       
         const { isEmail, isFullName,isCity,isProfileLink, isPassword, isConfirmPassword } = this.state
         this.setState({ isValidate: true })
-        if(!isEmail || !isFullName || !isCity || !isProfileLink || !isPassword || !isConfirmPassword) {
+        if(!isEmail || !isFullName || !isCity || !isProfileLink ) {
         // if(!isEmail || !isFullName || !isCity || !isProfileLink ) {
             return
         }
@@ -153,15 +162,6 @@ class SignUp extends Component {
         window.location.href = externalLoginUrl;
     }
 
-    handleSocialLogins = (user) => {
-        console.log("Success");
-        console.log(user)
-    }
-    
-    handleSocialLoginFailures = (err) => {
-        console.log("Failure");
-        console.error(err)
-    }
     callbackLinkedIn = (error, code, redirectUri) => {
         if (error) {
           // signin failed
@@ -174,32 +174,50 @@ class SignUp extends Component {
         }
       };
     render() {
-        const { isEmail, isPassword, isConfirmPassword, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state             
+        console.log(this.props);
+        const { isEmail, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state             
         return (
             <Wrapper>                      
                 <Header/>                       
                 <Content>
                     <Heading>Sign up now</Heading>
                     <ButtonWrapper>
-                    <GoogleLogin
-                        clientId="674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com"
-                        buttonText="Login"
-                        onSuccess={responseGoogle}
-                        onFailure={responseGoogle}
-                        cookiePolicy={'single_host_origin'}
-                    />
-                    <FacebookLogin
+                    <div className="sc-jbKcbu hQpXBD">
+                        <GoogleLogin
+                            clientId="674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com"
+                            onSuccess={responseGoogle}
+                            render={renderProps => (
+                                <div onClick={renderProps.onClick} disabled={renderProps.disabled} style={{ display:"inline-flex" }}>
+                                    <img src="/assets/svgs/google-icon.svg" alt="google"/>
+                                    <p>Sign up with Google</p>
+                                </div>
+                                
+                              )}
+                            onFailure={responseGoogle}
+                            cookiePolicy={'single_host_origin'}
+                            isSignedIn={'true'}
+                            icon={'false'}
+                        />
+                    </div>
+                    {/* <FacebookLogin
                         appId="353197588660922"
                         autoLoad={true}
                         fields="name,email,picture"
                         // onClick={componentClicked}
                         callback={responseFacebook} 
-                    />
-                     <LinkedIn
-                        clientId="81rg1g83flx6m5"
-                        callback={this.callbackLinkedIn}
-                        text="Login With LinkedIn"
-                    />
+                    /> */}
+                     <div className="sc-jbKcbu linKDN">
+                        <LinkedIn
+                            clientId="81rg1g83flx6m5"
+                            callback={this.callbackLinkedIn}
+                            text="Login With LinkedIn"
+                            img={Images.google}
+                            alt={'linkedIn'}
+                        >
+                        <img src={Images.google} alt="google" />
+                            <p>Sign up with Google</p>
+                        </LinkedIn>
+                     </div>
                     {/* <SocialButtons
                     provider='google'
                     appId='674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com'
@@ -208,20 +226,23 @@ class SignUp extends Component {
                     >
                     Login with Google
                     </SocialButtons> */}
-                    { this.props.hasExternalLogins && this.props.externalLogins['google'] &&
-                        <SocialButton google onClick={() =>this.handleSocialLogin('google')}>
+                    
+                    {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
+                        <SocialButton style={{ display:"none" }} google onClick={() =>this.handleSocialLogin('google')}>
                             <img src={Images.google} alt="google" />
                             <p>Sign up with Google</p>
-                        </SocialButton> }
+                        </SocialButton>
+                    {/* }*/}
                     { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
                         <SocialButton onClick={() =>this.handleSocialLogin('facebook')}>
                             <img src={Images.facebook1} alt="facebook" />
                             <p>Sign up with Facebook</p>
                         </SocialButton> }
                     </ButtonWrapper>
+                    <CircleButton>Or</CircleButton>
                     { this.props.hasExternalLogins && <CircleButton>Or</CircleButton> }
                     {/* { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink) */}
-                    { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink || !isPassword || !isConfirmPassword)
+                    { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink)
                         ? <Text>Please fill in required fields</Text>
                         : null
                     }
@@ -303,52 +324,12 @@ class SignUp extends Component {
                         ? <UnderLine error></UnderLine>
                         : <UnderLine></UnderLine>
                     }
-                    <Form>
-                        <MuiThemeProvider>
-                            <TextField
-                                name="password"
-                                type="password"
-                                onChange={this.getValue}
-                                floatingLabelText="Password"
-                                floatingLabelStyle={ isValidate && !isPassword ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                                floatingLabelShrinkStyle={ isValidate && !isPassword ? styles.focusStyle.error : styles.focusStyle.success }
-                                underlineShow={false}
-                                />              
-                        </MuiThemeProvider> 
-                        { isPassword && <Img src={Images.check} alt="checked"></Img> }
-                        { isValidate && !isPassword && <Img src={Images.warnning} alt="warnning"></Img> }
-                        { !isPassword && !isValidate && <Img empty></Img> } 
-                    </Form> 
-                    { !isPassword && isValidate
-                        ? <UnderLine error></UnderLine>
-                        : <UnderLine></UnderLine>
-                    }
-                    <Form>
-                        <MuiThemeProvider>
-                            <TextField
-                                name="confirmPassword"
-                                type="password"
-                                onChange={this.getValue}
-                                floatingLabelText="Confirm Password"
-                                floatingLabelStyle={ isValidate && !isConfirmPassword ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                                floatingLabelShrinkStyle={ isValidate && !isConfirmPassword ? styles.focusStyle.error : styles.focusStyle.success }
-                                underlineShow={false}
-                                />              
-                        </MuiThemeProvider> 
-                        { isConfirmPassword && <Img src={Images.check} alt="checked"></Img> }
-                        { isValidate && !isConfirmPassword && <Img src={Images.warnning} alt="warnning"></Img> }
-                        { !isConfirmPassword && !isValidate && <Img empty></Img> } 
-                    </Form> 
-                    { !isConfirmPassword && isValidate
-                        ? <UnderLine error></UnderLine>
-                        : <UnderLine></UnderLine>
-                    }
+
                     { isLoading
                         ? <SpinWrapper><ReactLoading type="spinningBubbles" color="#4cbf69" height='70' width='70' /></SpinWrapper>
                         :
                         <ButtonWrapper signup>
-                        {/* { !isValidate || (isEmail && isFullName && isCity && isProfileLink ) */}
-                            { !isValidate || (isEmail &&  isFullName && isCity && isProfileLink && isPassword && isConfirmPassword )
+                        { !isValidate || (isEmail && isFullName && isCity && isProfileLink )
                                 ? <SignUpButton active onClick={this.handleSignUp}>Sign Up</SignUpButton>
                                 : <SignUpButton onClick={this.handleSignUp}>Sign Up</SignUpButton>
                             }
