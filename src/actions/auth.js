@@ -2,7 +2,8 @@ import * as Types from '../constants/actionType';
 import { request, requestApi } from '../services/request';
 import { browserHistory } from 'react-router';
 import * as urls from '../constants/urls';
-
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 export function getPasswordResetToken(data) {
     return function (dispatch) {
         return new Promise((resolve, reject) => {
@@ -52,6 +53,25 @@ export function setNewPassword(data) {
 export function getExternalLogins() {
     return function (dispatch) {
         return new Promise((resolve, reject) => {
+            // if (cookies.get('userInfo').loggedIn) {
+            //     console.log('User has registered');
+            //     let data = {
+            //         isLoggedIn:true,
+            //         hasRegistered:true,
+            //         fullName:cookies.get('name')
+            //     }
+            //     const externalLogins = {
+            //         url:"/profile/talent/person"
+            //     }
+            //                     let hasExternalLogins=1
+            //     console.log(data);
+            //     dispatch({
+            //         type: Types.GOT_EXTERNAL_LOGINS,
+            //         data: {externalLogins, hasExternalLogins}
+            //     });
+            // } else {
+            //     console.log('User hasn\'t registered');
+            // }
             var url = 'api/Account/ExternalLogins?returnUrl=' + encodeURIComponent(urls.CLIENT_HOST) + '&generateState=true';
             console.log('getExternalLogins:url:', url);
             return requestApi(url, null, 'GET')
@@ -87,6 +107,7 @@ export function startExternalLogin(externalLoginUrl) {
 }
 
 export function getUserInfo(headers){
+    console.log(headers);
     return function(dispatch){
         return new Promise((resolve, reject) => {
             return requestApi('api/Account/UserInfo', null, 'GET', headers)

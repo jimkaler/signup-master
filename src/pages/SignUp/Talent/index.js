@@ -5,6 +5,7 @@ import TextField from 'material-ui/TextField'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux' 
 import ReactLoading from 'react-loading'
+import cookie from 'react-cookies'
 
 import Header from '../../../components/Header'
 import SocialButtons from '../../../components/ButtonJs'
@@ -30,6 +31,8 @@ import { GoogleLogin } from 'react-google-login';
 import FacebookLogin from 'react-facebook-login';
 // import LinkedIn from 'react-linkedin-login';
 import LinkedIn from "linkedin-login-for-react";
+import Cookies from 'universal-cookie';
+import * as Types from '../../../constants/actionType';
 
 const styles = {
     floatingLabelStyle: {
@@ -53,8 +56,41 @@ const styles = {
         }         
     }
 }
+const cookies = new Cookies();
 const responseGoogle = (response) => {
     console.log(response);
+    if(response.error){
+        console.log(response.error)
+        let userInfo = {
+            loggedIn:false
+        }
+    }else{
+        const expires = new Date()
+        expires.setDate(expires.getDate() + 14)
+        let userInfo = {
+            log:response.Zi.access_token,
+            email:response.profileObj.email,
+            firstName:response.profileObj.givenName,
+            lastName:response.profileObj.familyName,
+            image:response.profileObj.imageUrl,
+            name:response.profileObj.name,
+            loggedIn:true
+        }
+        userInfo = JSON.stringify(userInfo);
+        userInfo = JSON.parse(userInfo);
+        // console.log(userInfo);
+        cookies.set('userInfo', userInfo, { path: '/' });
+        // this.props.state.dispatch({
+        //     type: Types.LOGIN_SUCCESS,
+        //     data: userInfo
+        // });
+        if(cookies.get('userInfo').loggedIn){
+            browserHistory.push('/profile/talent/person');
+        }
+        
+    }
+
+        console.log(cookies.get('userInfo').loggedIn);
   }
   const responseFacebook = (response) => {
     console.log(response);
@@ -100,13 +136,13 @@ class SignUp extends Component {
     }
 
     getValue = (e) => {
+        console.log(window.location.origin);
         let { name, value } = e.target
         this.setState({ [name]: value})
         if (name === 'email') {
             this.setState({ isEmail: Validate.emailValidate(value)})
         }
         if (name === 'fullName') {
-            console.log(Validate.fullnameValidate(value));
             this.setState({ isFullName: Validate.fullnameValidate(value)})
         }
         if (name === 'city') {
@@ -134,8 +170,10 @@ class SignUp extends Component {
         this.setState({ isLoading: true })
         const obj = {
             email: this.state.email,
-            password: this.state.password,
-            confirmPassword: this.state.confirmPassword
+            name:this.state.fullName,
+            city:this.state.city,
+            socialLink:this.state.profileLink,
+            passwordUrl:window.location.origin+"/change-password/talent"
         }   
         this.props.actions.reset()     
         this.props.actions.signUpRequest(obj)
@@ -184,7 +222,7 @@ class SignUp extends Component {
                     <ButtonWrapper>
                     <div className="sc-jbKcbu hQpXBD">
                         <GoogleLogin
-                            clientId="674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com"
+                            clientId={urls.GOOGLE_KEY}
                             onSuccess={responseGoogle}
                             render={renderProps => (
                                 <div onClick={renderProps.onClick} disabled={renderProps.disabled} style={{ display:"inline-flex" }}>

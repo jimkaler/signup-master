@@ -8,7 +8,9 @@ import ReactLoading from 'react-loading'
 import * as urls from '../../../constants/urls'
 import { getExternalLogins, signInRequest, startExternalLogin } from '../../../actions/auth'
 import { reset } from '../../../reducers'
-
+import { GoogleLogin } from 'react-google-login';
+import LinkedIn from "linkedin-login-for-react";
+import Cookies from 'universal-cookie';
 
 import Header from '../../../components/Header'
 import { 
@@ -31,7 +33,7 @@ import {
 } from './Style'
 import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
-
+const cookies = new Cookies();
 const styles = {
     floatingLabelStyle: {
         error : {
@@ -54,6 +56,48 @@ const styles = {
         }         
     }
 }
+const spanStyle ={
+    display:'flex'
+}
+const pStyle ={
+    fontFamily:'NudistaLight'
+}
+
+const responseGoogle = (response) => {
+    console.log(response);
+    if(response.error){
+        console.log(response.error)
+        let userInfo = {
+            loggedIn:false
+        }
+    }else{
+        const expires = new Date()
+        expires.setDate(expires.getDate() + 14)
+        let userInfo = {
+            log:response.Zi.access_token,
+            email:response.profileObj.email,
+            firstName:response.profileObj.givenName,
+            lastName:response.profileObj.familyName,
+            image:response.profileObj.imageUrl,
+            name:response.profileObj.name,
+            loggedIn:true
+        }
+        userInfo = JSON.stringify(userInfo);
+        userInfo = JSON.parse(userInfo);
+        // console.log(userInfo);
+        cookies.set('userInfo', userInfo, { path: '/' });
+        // this.props.state.dispatch({
+        //     type: Types.LOGIN_SUCCESS,
+        //     data: userInfo
+        // });
+        if(cookies.get('userInfo').loggedIn){
+            browserHistory.push('/profile/talent/person');
+        }
+        
+    }
+
+        console.log(cookies.get('userInfo').loggedIn);
+  }
 
 class SignIn extends Component {
     constructor(props){
@@ -131,6 +175,17 @@ class SignIn extends Component {
         browserHistory.push('/get-password/talent');
     }
 
+    callbackLinkedIn = (error, code, redirectUri) => {
+        if (error) {
+          // signin failed
+          console.log(error);
+        } else {
+            console.log(code);
+            console.log(redirectUri);
+          // Obtain authorization token from linkedin api
+          // see https://developer.linkedin.com/docs/oauth2 for more info
+        }
+      };
     render() {
         const { isEmail, isPassword, isValidate, isLoading, errorMessage } = this.state             
         return (
@@ -140,12 +195,49 @@ class SignIn extends Component {
                     <Heading>Sign in now</Heading>
                     { errorMessage ? <Text>{errorMessage}</Text> : null }
                     <ButtonWrapper>
-                    { this.props.hasExternalLogins && this.props.externalLogins['google'] &&
-                        <SocialButton google onClick={() =>this.handleSocialLogin('google')}>
+                    <div className="sc-jbKcbu gnyyqT">
+                        <GoogleLogin
+                            clientId={urls.GOOGLE_KEY}
+                            onSuccess={responseGoogle}
+                            render={renderProps => (
+                                <div onClick={renderProps.onClick} disabled={renderProps.disabled} style={{ display:"inline-flex" }}>
+                                    <img src="/assets/svgs/google-icon.svg" alt="google"/>
+                                    <p>Sign up with Google</p>
+                                </div>
+                                
+                              )}
+                            onFailure={responseGoogle}
+                            cookiePolicy={'single_host_origin'}
+                            isSignedIn={'true'}
+                            icon={'false'}
+                        />
+                    </div>
+                    {/* <FacebookLogin
+                        appId="353197588660922"
+                        autoLoad={true}
+                        fields="name,email,picture"
+                        // onClick={componentClicked}
+                        callback={responseFacebook} 
+                    /> */}
+                     <div className="sc-jbKcbu linKDN">
+                        <LinkedIn
+                            clientId="81rg1g83flx6m5"
+                            callback={this.callbackLinkedIn}
+                            text="Sign up With LinkedIn"
+                            img={Images.google}
+                            alt={'linkedIn'}
+                        >
+                        <img src={Images.google} alt="google" />
+                            <p>Sign up with Google</p>
+                        </LinkedIn>
+                     </div>
+                     
+                    {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
+                        <SocialButton style={{ display:"none" }} google onClick={() =>this.handleSocialLogin('google')}>
                             <img src={Images.google} alt="google" />
                             <p>Sign in with Google</p>
                         </SocialButton> 
-                        }
+                        {/* } */}
                     { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
                         <SocialButton onClick={() =>this.handleSocialLogin('facebook')}>
                             <img src={Images.facebook1} alt="facebook" />

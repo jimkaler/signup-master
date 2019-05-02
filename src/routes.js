@@ -6,6 +6,7 @@ import Home from './pages/LandingPage'
 import TalentSignIn from './pages/SignIn/Talent'
 import TalentSignUp from './pages/SignUp/Talent'
 import TalentForgotPassword from './pages/ForgotPassword/Talent'
+import TalentChangePassword from './pages/ChangePassword/Talent'
 import EmployerSignUp from './pages/SignUp/Employer'
 import TalentPage from './pages/Profile/Talent'
 import EmployerPage from './pages/Profile/Employer'
@@ -26,6 +27,7 @@ export default (
         <Route path="/signin/talent" component={ TalentSignIn } />
         <Route path="/signup/talent" component={ TalentSignUp } />
         <Route path="/get-password/talent" component={ TalentForgotPassword } />
+        <Route path="/change-password/talent" component={ TalentChangePassword } />
         <Route path="/signup/employer" component={ EmployerSignUp } />
         <Route path="/profile/talent" component={ TalentPage }>
             <IndexRoute component={ Person } />
