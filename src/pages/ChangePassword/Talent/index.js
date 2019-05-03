@@ -135,6 +135,7 @@ class ChangePassword extends Component {
                             errorText:response.data.data[0].message,
                             isSuccess:false,
                             isLoading: false,
+                            isOldPassword:false
                             });
                     }
                     // console.log(response.data.data[0]);
