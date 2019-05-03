@@ -28,6 +28,12 @@ export function passwordValidate(password){
     }
     return false
 }
+export function SignInpasswordValidate(password){
+    if (password.length > 5) {
+        return true
+    }
+    return false
+}
 
 export function confirmPasswordValidate(confirmPassword, password){
     if (password.length > 6 && password == confirmPassword) {

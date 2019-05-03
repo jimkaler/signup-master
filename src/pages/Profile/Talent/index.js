@@ -4,12 +4,18 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { getUserProfile } from '../../../actions/talent'
-
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 class TalentPage extends Component {
 
     componentWillMount(){        
-        if (!this.props.isLoggedIn){
-            this.props.type === 'talent'
+        // if (!this.props.isLoggedIn){
+        //     this.props.type === 'talent'
+        //     ? browserHistory.push('/signin/talent')
+        //     : browserHistory.push('signup/employer');
+        // }
+        if (!cookies.get('isLoggedIn') || cookies.get('isLoggedIn')==='undefined'){
+            cookies.get('authType') === 'talent'
             ? browserHistory.push('/signin/talent')
             : browserHistory.push('signup/employer');
         }

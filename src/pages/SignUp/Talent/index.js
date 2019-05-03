@@ -74,7 +74,7 @@ const responseGoogle = (response) => {
             lastName:response.profileObj.familyName,
             image:response.profileObj.imageUrl,
             name:response.profileObj.name,
-            loggedIn:true
+            id:response.Zi.access_token
         }
         userInfo = JSON.stringify(userInfo);
         userInfo = JSON.parse(userInfo);

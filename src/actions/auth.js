@@ -161,6 +161,7 @@ export function signInRequest(credentials){
             credentials.grant_type = 'password';
             return requestApi('Token', credentials, "POST")
                 .then(response => {
+                    
                     console.log('signInRequest.response: ', response)
                     dispatch({
                         type: Types.LOGIN_SUCCESS,

@@ -138,7 +138,6 @@ class ChangePassword extends Component {
                             isOldPassword:false
                             });
                     }
-                    // console.log(response.data.data[0]);
                 }).catch((err) => {
                     this.setState({ 
                         isLoading: false,
@@ -146,7 +145,7 @@ class ChangePassword extends Component {
                         isSuccess:false
                      });
                      
-                })
+                });
 
         } 
         

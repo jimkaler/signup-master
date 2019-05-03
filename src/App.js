@@ -60,7 +60,7 @@ class App extends Component {
         if (this.state.isLoading) {
             return (
                 <div style={{display:'flex', justifyContent:'center'}}>
-                    <ReactLoading type="bubbles" color="#4cbf69" height='100' width='100' />
+                    <ReactLoading type="bubbles" style={{ fill:"rgb(76, 191, 105)", height:"100px",width:"100px" }}  />
                 </div>
             );
         } else {

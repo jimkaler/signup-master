@@ -20,7 +20,8 @@ import Images from '../../themes/images'
 import { getEditState } from '../../actions/auth'
 import { reset } from '../../reducers'
 import { disableScrolling, enableScrolling } from '../../jquery';
-
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 class Navigation extends Component {
     constructor() {
         super()
@@ -67,29 +68,51 @@ class Navigation extends Component {
     }
 
     toggleAction = () => {
-        if(this.props.type === 'talent'){
-            if(this.props.isLoggedIn){                  
-                this.props.actions.reset()   
+        if(cookies.get('authType')==='talent'){
+            if(cookies.get('isLoggedIn')){
                 if(this.state.isActive){
-                    this.setState({
-                        isActive: false
-                    })
-                    this.scrollingOnMobile()
-                    enableScrolling('desktop')      
-                }         
-            } else {
-                if(this.state.isActive){
-                    this.setState({
-                        isActive: false
-                    })
-                    this.scrollingOnMobile()
-                    enableScrolling('desktop')      
-                }
-            }            
+                        this.setState({
+                            isActive: false
+                        })
+                        this.scrollingOnMobile()
+                        enableScrolling('desktop')      
+                    }         
+                } else {
+                    if(this.state.isActive){
+                        this.setState({
+                            isActive: false
+                        })
+                        this.scrollingOnMobile()
+                        enableScrolling('desktop')      
+                    }
+            }
             browserHistory.push('/signin/talent')
-        } else {
+        }else{
             browserHistory.push('/signup/employer')
         }
+        // if(this.props.type === 'talent'){
+        //     if(this.props.isLoggedIn){                  
+        //         this.props.actions.reset()   
+        //         if(this.state.isActive){
+        //             this.setState({
+        //                 isActive: false
+        //             })
+        //             this.scrollingOnMobile()
+        //             enableScrolling('desktop')      
+        //         }         
+        //     } else {
+        //         if(this.state.isActive){
+        //             this.setState({
+        //                 isActive: false
+        //             })
+        //             this.scrollingOnMobile()
+        //             enableScrolling('desktop')      
+        //         }
+        //     }            
+        //     browserHistory.push('/signin/talent')
+        // } else {
+        //     browserHistory.push('/signup/employer')
+        // }
     }
 
     menu = () => {

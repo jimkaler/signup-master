@@ -33,6 +33,7 @@ import {
 } from './Style'
 import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
+import axios from 'axios';
 const cookies = new Cookies();
 const styles = {
     floatingLabelStyle: {
@@ -62,14 +63,13 @@ const spanStyle ={
 const pStyle ={
     fontFamily:'NudistaLight'
 }
-
+const expires = new Date()
+expires.setDate(expires.getDate() + 14)
 const responseGoogle = (response) => {
     console.log(response);
     if(response.error){
         console.log(response.error)
-        let userInfo = {
-            loggedIn:false
-        }
+        cookies.set('isLoggedIn', false, { path: '/' });
     }else{
         const expires = new Date()
         expires.setDate(expires.getDate() + 14)
@@ -80,23 +80,21 @@ const responseGoogle = (response) => {
             lastName:response.profileObj.familyName,
             image:response.profileObj.imageUrl,
             name:response.profileObj.name,
-            loggedIn:true
+            id:response.Zi.access_token
         }
         userInfo = JSON.stringify(userInfo);
         userInfo = JSON.parse(userInfo);
         // console.log(userInfo);
-        cookies.set('userInfo', userInfo, { path: '/' });
-        // this.props.state.dispatch({
-        //     type: Types.LOGIN_SUCCESS,
-        //     data: userInfo
-        // });
-        if(cookies.get('userInfo').loggedIn){
-            browserHistory.push('/profile/talent/person');
-        }
+        cookies.set('userInfo', userInfo, { path: '/' },expires,expires);
+        cookies.set('isLoggedIn', true, { path: '/' },expires,expires);
+        
         
     }
+    if(cookies.get('isLoggedIn')){
+        browserHistory.push('/profile/talent/person');
+    }
 
-        console.log(cookies.get('userInfo').loggedIn);
+        // console.log(cookies.get('userInfo'));
   }
 
 class SignIn extends Component {
@@ -112,10 +110,16 @@ class SignIn extends Component {
     }
 
     componentWillMount() {
-        if(this.props.isLoggedIn){
-            browserHistory.push('/profile/talent/candidate')
+        // if(this.props.isLoggedIn){
+        //     browserHistory.push('/profile/talent/candidate')
+        // }
+        if(cookies.get('isLoggedIn')){
+            console.log(cookies.get('isLoggedIn'))
+            //   browserHistory.push('/profile/talent/person');
+            browserHistory.push('/profile/talent/person');
         }
         console.log('SignIn:componentWillMount');
+        cookies.set('authType', 'talent', { path: '/' },expires,expires);
     }
 
     componentDidMount() {
@@ -123,6 +127,8 @@ class SignIn extends Component {
             // Request external login providers
             this.props.actions.getExternalLogins();
         }
+        console.log(cookies.get('userInfo'))
+        
         console.log('SignIn:componentDidMount');
     }
 
@@ -133,7 +139,7 @@ class SignIn extends Component {
             this.setState({ isEmail: Validate.emailValidate(value)})
         }
         if(name === 'password'){
-            this.setState({ isPassword: Validate.passwordValidate(value)})
+            this.setState({ isPassword: Validate.SignInpasswordValidate(value)})
         }
         e.preventDefault()
     }
@@ -151,19 +157,88 @@ class SignIn extends Component {
             return
         }
         this.setState({ isLoading: true })
-        const obj = {
-            username: this.state.email,
-            password: this.state.password
-        }
-        this.props.actions.reset();
-        this.props.actions.signInRequest(obj)
-            .then(() => {
-                browserHistory.push('/profile/talent/candidate')
+        let bodyFormData = new FormData();
+        bodyFormData.append('Email',this.state.email);
+        bodyFormData.append('Password',this.state.password);
+        axios({
+            method: 'post',
+            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserLogin',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
             })
-            .catch((error) => {
-                this.setState({ errorMessage: 'The user name or password is incorrect.' })
-                this.setState({ isLoading: false })
-            })
+            .then((response) => {
+                console.log(response.data.status)
+                if(response.data.status){
+                    let userInfo = {
+                        log:'',
+                        email:response.data.data[0].Email,
+                        firstName:'',
+                        lastName:'',
+                        image:'',
+                        id:response.data.data[0].Id,
+                        name:'',
+                    }
+                    this.setState({
+                        isLoading:false 
+                    })
+                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                }else{
+                    this.setState({
+                        errorMessage: 'The user name or password is incorrect.',
+                        isLoading:false 
+                    })
+                }
+                // data:
+                //     data: Array(1)
+                //     0:
+                //     CreatedAt: "5/3/2019 5:41:49 AM"
+                //     Email: "jagdishprotolabz@gmail.com"
+                //     Id: 11
+                //     Location: "India"
+                //     Password: "123456789"
+                //     SocialLink: "facebook.com"
+                //     Token: ""
+                //     TransactionId: ""
+
+                // if(response.data.data[0].ret){
+                //     this.setState({ 
+                //         isError:false,
+                //         isSuccess:true,
+                //         isLoading: false,
+                //      });
+                //      setTimeout(function(){  browserHistory.push('signin/talent'); }, 3000);
+                // }else{
+                //     this.setState({ 
+                //         isError:true,
+                //         errorText:response.data.data[0].message,
+                //         isSuccess:false,
+                //         isLoading: false,
+                //         isOldPassword:false
+                //         });
+                // }
+            }).catch((err) => {
+                this.setState({ 
+                    isLoading: false,
+                    isError:true,
+                    isSuccess:false
+                 });
+                 
+            });
+       
+        // const obj = {
+        //     username: this.state.email,
+        //     password: this.state.password
+        // }
+        // this.props.actions.reset();
+        // this.props.actions.signInRequest(obj)
+        //     .then(() => {
+        //         browserHistory.push('/profile/talent/candidate')
+        //     })
+        //     .catch((error) => {
+        //         this.setState({ errorMessage: 'The user name or password is incorrect.' })
+        //         this.setState({ isLoading: false })
+        //     })
     }
 
     handleSignUp = () => {
@@ -193,7 +268,7 @@ class SignIn extends Component {
                 <Header/>                       
                 <Content>
                     <Heading>Sign in now</Heading>
-                    { errorMessage ? <Text>{errorMessage}</Text> : null }
+                   
                     <ButtonWrapper>
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
@@ -249,7 +324,8 @@ class SignIn extends Component {
                     }
                     {    isValidate && (!isEmail || !isPassword ) ?
                         <Text>Please fill in required fields</Text> : null
-                    }                    
+                    }         
+                     { errorMessage ? <Text>{errorMessage}</Text> : null }           
                     <Form>
                         <MuiThemeProvider>
                             <TextField
