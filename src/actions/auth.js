@@ -183,7 +183,7 @@ export function signInRequest(credentials){
 export function signUpRequest(userInfo){
     return function (dispatch) {
         return new Promise((resolve, reject) => {
-            requestApi('/UserRegistration', userInfo, "POST")
+            requestApi('UserRegistration', userInfo, "POST")
                 .then(
                     response => {
                         if(response.data[0].ret){
