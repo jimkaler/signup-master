@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@zalando/oauth2-client-js": "0.0.18",
+    "axios": "^0.18.0",
     "detect-browser": "^2.0.0",
     "jquery": "^3.2.1",
     "linkedin-login-for-react": "^1.1.3",

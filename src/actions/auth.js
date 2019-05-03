@@ -53,48 +53,52 @@ export function setNewPassword(data) {
 export function getExternalLogins() {
     return function (dispatch) {
         return new Promise((resolve, reject) => {
-            // if (cookies.get('userInfo').loggedIn) {
-            //     console.log('User has registered');
-            //     let data = {
-            //         isLoggedIn:true,
-            //         hasRegistered:true,
-            //         fullName:cookies.get('name')
-            //     }
-            //     const externalLogins = {
-            //         url:"/profile/talent/person"
-            //     }
-            //                     let hasExternalLogins=1
-            //     console.log(data);
-            //     dispatch({
-            //         type: Types.GOT_EXTERNAL_LOGINS,
-            //         data: {externalLogins, hasExternalLogins}
-            //     });
-            // } else {
-            //     console.log('User hasn\'t registered');
-            // }
-            var url = 'api/Account/ExternalLogins?returnUrl=' + encodeURIComponent(urls.CLIENT_HOST) + '&generateState=true';
-            console.log('getExternalLogins:url:', url);
-            return requestApi(url, null, 'GET')
-                .then(
-                    response => {
-                        console.log('getExternalLogins:done:', response);
-                        const externalLogins = response.reduce((prev, item, i, arr) => {
-                            prev[item.name.toLowerCase()] = {
-                                url: item.url,
-                                state: item.state
-                            };
-                            return prev;
-                        }, {});
-                        const hasExternalLogins = response.length > 0;
-                        dispatch({
-                            type: Types.GOT_EXTERNAL_LOGINS,
-                            data: {externalLogins, hasExternalLogins}
-                        });
-                    },
-                    error => {
-                        console.error('getExternalLogins:fail:', error);
-                    }
-                )
+            if (cookies.get('userInfo')!='') {
+                console.log('User has registered');
+                let data = {
+                    isLoggedIn:true,
+                    hasRegistered:true,
+                    fullName:cookies.get('name')
+                }
+                const externalLogins = {
+                    url:"/profile/talent/person"
+                }
+                let hasExternalLogins=1
+                console.log(data);
+                dispatch({
+                    type: Types.GOT_EXTERNAL_LOGINS,
+                    data: { hasExternalLogins}
+                });
+            } else {
+                console.log('User hasn\'t registered');
+            }
+
+
+
+            // var url = 'api/Account/ExternalLogins?returnUrl=' + encodeURIComponent(urls.CLIENT_HOST) + '&generateState=true';
+            // console.log('getExternalLogins:url:', url);
+            // return requestApi(url, null, 'GET')
+            //     .then(
+            //         response => {
+            //             console.log('getExternalLogins:done:', response);
+            //             const externalLogins = response.reduce((prev, item, i, arr) => {
+            //                 prev[item.name.toLowerCase()] = {
+            //                     url: item.url,
+            //                     state: item.state
+            //                 };
+            //                 return prev;
+            //             }, {});
+            //             console.log(externalLogins)
+            //             const hasExternalLogins = response.length > 0;
+            //             dispatch({
+            //                 type: Types.GOT_EXTERNAL_LOGINS,
+            //                 data: {externalLogins, hasExternalLogins}
+            //             });
+            //         },
+            //         error => {
+            //             console.error('getExternalLogins:fail:', error);
+            //         }
+            //     )
         })
     }
 }
@@ -107,7 +111,6 @@ export function startExternalLogin(externalLoginUrl) {
 }
 
 export function getUserInfo(headers){
-    console.log(headers);
     return function(dispatch){
         return new Promise((resolve, reject) => {
             return requestApi('api/Account/UserInfo', null, 'GET', headers)
@@ -180,15 +183,18 @@ export function signInRequest(credentials){
 export function signUpRequest(userInfo){
     return function (dispatch) {
         return new Promise((resolve, reject) => {
-            requestApi('api/Account/Register', userInfo, "POST")
+            requestApi('/UserRegistration', userInfo, "POST")
                 .then(
                     response => {
-                        console.log('signUpRequest.done', response)
-                        dispatch({
-                            type: Types.SIGNUP_SUCCESS,
-                            data: response
-                        });
-                        resolve(true);
+                        if(response.data[0].ret){
+                            resolve(true);
+                        }
+                        // console.log('signUpRequest.done', response)
+                        // dispatch({
+                        //     type: Types.SIGNUP_SUCCESS,
+                        //     data: response
+                        // });
+                        // resolve(true);
                     },
                     error => {
                         console.log('signUpRequest.catch', error)

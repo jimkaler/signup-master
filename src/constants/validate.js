@@ -13,6 +13,15 @@ export function codeValidate(code){
     return false
 }
 
+export function oldPasswordValidate(oldPassword){
+    let b= false;
+    if (oldPassword.length > 5) {
+        return true
+        b = true
+    }
+    return false
+    console.log(b)
+}
 export function passwordValidate(password){
     if (password.length > 6) {
         return true

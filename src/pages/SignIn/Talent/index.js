@@ -238,11 +238,11 @@ class SignIn extends Component {
                             <p>Sign in with Google</p>
                         </SocialButton> 
                         {/* } */}
-                    { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
+                    {/* { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
                         <SocialButton onClick={() =>this.handleSocialLogin('facebook')}>
                             <img src={Images.facebook1} alt="facebook" />
                             <p>Sign in with Facebook</p>
-                        </SocialButton> }
+                        </SocialButton> } */}
                     </ButtonWrapper>
                     { this.props.hasExternalLogins && 
                     <CircleButton>Or</CircleButton> 

@@ -23,6 +23,8 @@ import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
 import { reset } from '../../../reducers'
 import { getPasswordResetToken, setNewPassword } from '../../../actions/auth'
+import axios from 'axios';
+import * as urls from '../../../constants/urls';
 
 const styles = {
     floatingLabelStyle: {
@@ -46,16 +48,25 @@ const styles = {
         }         
     }
 }
+const successStyle ={
+    color: 'green',
+    fontSize: '23px'
+  }
 
 class ChangePassword extends Component {
     constructor(props){
         super(props)  
         this.state = {
             isEmail: false,
+            isOldPassword:false,
             isPassword: false,
             isConfirmPassword: false,
             isValidate: false,
-            isLoading: false
+            isLoading: false,
+            uid:'',
+            isError:false,
+            isSuccess:false,
+            errorText:"Something Went Wrong"
         }
     }
 
@@ -63,16 +74,20 @@ class ChangePassword extends Component {
         if(this.props.isLoggedIn){
             browserHistory.push('/profile/talent')
         }
+        if(window.location.search!==''){
+            let uID = window.location.search;
+            uID = uID.slice(5)
+            this.setState({uid:uID})
+        }else{
+            browserHistory.push('/signin/talent')
+        }
     }
 
     getValue = (e) => {
         let { name, value } = e.target
         this.setState({ [name]: value})
-        // if (name === 'email') {
-        //     this.setState({ isEmail: Validate.emailValidate(value)})
-        // }
-        if (name === 'token') {
-            this.setState({ isCode: Validate.codeValidate(value)})
+        if (name === 'oldPassword') {
+            this.setState({ isOldPassword: Validate.oldPasswordValidate(value)})
         }
         if (name === 'newPassword') {
             this.setState({ isPassword: Validate.passwordValidate(value)})
@@ -84,49 +99,60 @@ class ChangePassword extends Component {
     }
 
     handleSubmit = () => {
-        if (this.props.hasPasswordResetTokenSent) {
-            const { isPassword, isConfirmPassword } = this.state
+        if (this.state.uid!=='') {
+            const { isOldPassword, isPassword, isConfirmPassword } = this.state
             this.setState({ isValidate: true })
-            if(!isPassword || !isConfirmPassword) {
+            if(!isOldPassword || !isPassword || !isConfirmPassword) {
                 return
             }
             this.setState({ isLoading: true })
             const obj = {
-                email: this.state.email,
-                token: this.state.token,
+                userId: this.state.uid,
+                oldPassword: this.state.oldPassword,
                 newPassword: this.state.newPassword,
-                confirmPassword: this.state.confirmPassword
             }   
-            this.props.actions.setNewPassword(obj)
-                .then(() => {
-                    browserHistory.push('/signin/talent');
+            let bodyFormData = new FormData();
+            bodyFormData.append('UserId',this.state.uid);
+            bodyFormData.append('OldPassword',this.state.oldPassword);
+            bodyFormData.append('newPassword',this.state.newPassword);
+            axios({
+                method: 'post',
+                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/ChangePassword',
+                data: bodyFormData,
+                config: { headers: {'Content-Type': 'multipart/form-data' }}
                 })
-                .catch((error) => {
-                    this.setState({ isLoading: false })
+                .then((response) => {
+                    if(response.data.data[0].ret){
+                        this.setState({ 
+                            isError:false,
+                            isSuccess:true,
+                            isLoading: false,
+                         });
+                         setTimeout(function(){  browserHistory.push('signin/talent'); }, 3000);
+                    }else{
+                        this.setState({ 
+                            isError:true,
+                            errorText:response.data.data[0].message,
+                            isSuccess:false,
+                            isLoading: false,
+                            });
+                    }
+                    // console.log(response.data.data[0]);
+                }).catch((err) => {
+                    this.setState({ 
+                        isLoading: false,
+                        isError:true,
+                        isSuccess:false
+                     });
+                     
                 })
-        } else {
-            const { isEmail } = this.state
-            this.setState({ isValidate: true })
-            if(!isEmail) {
-                return
-            }
-            this.setState({ isLoading: true })
-            const obj = {
-                email: this.state.email,
-            }
-            this.props.actions.reset()
-            this.props.actions.getPasswordResetToken(obj)
-                .then(() => {
-                    this.setState({ isLoading: false })
-                })
-                .catch((error) => {
-                    this.setState({ isLoading: false })
-                })
-        }
+
+        } 
+        
     }
 
     render() {
-        const { isPassword, isConfirmPassword, isValidate, isLoading } = this.state;
+        const { isOldPassword,isPassword, isConfirmPassword, isValidate, isLoading } = this.state;
         const newPasswordElement = (
             <Wrapper>
                 <Form>
@@ -136,16 +162,16 @@ class ChangePassword extends Component {
                             type="password"
                             onChange={this.getValue}
                             floatingLabelText="Old Password"
-                            floatingLabelStyle={ isValidate && !isPassword ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                            floatingLabelShrinkStyle={ isValidate && !isPassword ? styles.focusStyle.error : styles.focusStyle.success }
+                            floatingLabelStyle={ isValidate && !isOldPassword ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
+                            floatingLabelShrinkStyle={ isValidate && !isOldPassword ? styles.focusStyle.error : styles.focusStyle.success }
                             underlineShow={false}
                             />              
                     </MuiThemeProvider> 
-                    { isPassword && <Img src={Images.check} alt="checked"></Img> }
-                    { isValidate && !isPassword && <Img src={Images.warnning} alt="warnning"></Img> }
-                    { !isPassword && !isValidate && <Img empty></Img> } 
+                    { isOldPassword && <Img src={Images.check} alt="checked"></Img> }
+                    { isValidate && !isOldPassword && <Img src={Images.warnning} alt="warnning"></Img> }
+                    { !isOldPassword && !isValidate && <Img empty></Img> } 
                 </Form>
-                { !isPassword && isValidate
+                { !isOldPassword && isValidate
                     ? <UnderLine error></UnderLine>
                     : <UnderLine></UnderLine>
                 }
@@ -201,13 +227,21 @@ class ChangePassword extends Component {
                         ? <Text>Please fill in required fields</Text>
                         : null
                     }
+                    { this.state.isSuccess?
+                    <p class="sc-jqCOkK" style={successStyle}>Password has been changed successfully!</p>
+                    :null
+                    }
+                     { this.state.isError
+                        ? <Text>{this.state.errorText}</Text>
+                        : null
+                    }
                     { this.props.error ? <Text>{this.props.error}</Text> : null }
                     {  newPasswordElement }
                     { isLoading ? <SpinWrapper><ReactLoading type="spinningBubbles" color="#4cbf69" height='70' width='70' /></SpinWrapper> :
                         <ButtonWrapper signup>
                             {
                              !isValidate
-                             || (this.props.hasPasswordResetTokenSent && isPassword && isConfirmPassword)
+                             || (isPassword && isConfirmPassword)
                                  ? <SignUpButton active onClick={this.handleSubmit}>Submit</SignUpButton>
                                  : <SignUpButton onClick={this.handleSubmit}>Submit</SignUpButton>
                             }
@@ -234,7 +268,7 @@ const mapDispatchToProps = (dispatch) => {
         actions: bindActionCreators({
             reset,
             getPasswordResetToken,
-            setNewPassword
+            ChangePassword,
         }, dispatch)
     }
 }

@@ -80,8 +80,8 @@ const responseGoogle = (response) => {
         userInfo = JSON.parse(userInfo);
         // console.log(userInfo);
         cookies.set('userInfo', userInfo, { path: '/' });
-        // this.props.state.dispatch({
-        //     type: Types.LOGIN_SUCCESS,
+        // this.props.dispatch({
+        //     type: Types.GOT_EXTERNAL_LOGINS,
         //     data: userInfo
         // });
         if(cookies.get('userInfo').loggedIn){
@@ -101,6 +101,10 @@ const responseGoogle = (response) => {
   const pStyle ={
       fontFamily:'NudistaLight'
   }
+  const successStyle ={
+    color: 'green',
+    fontSize: '23px'
+  }
   
 class SignUp extends Component {
     constructor(props){
@@ -114,7 +118,8 @@ class SignUp extends Component {
             isProfileLink:false,
             isValidate: false,
             isLoading: false,
-            errorMessage: null
+            errorMessage: null,
+            isSuccess:false
         }
     }
 
@@ -169,8 +174,10 @@ class SignUp extends Component {
         }
         this.setState({ isLoading: true })
         const obj = {
-            email: this.state.email,
             name:this.state.fullName,
+            email: this.state.email,
+            token:"",
+            transactionId:"",
             city:this.state.city,
             socialLink:this.state.profileLink,
             passwordUrl:window.location.origin+"/change-password/talent"
@@ -178,15 +185,19 @@ class SignUp extends Component {
         this.props.actions.reset()     
         this.props.actions.signUpRequest(obj)
         .then(() => {
-            console.log('signInRequest.start')
-            const credentials = {
-                username: this.state.email,
-                password: this.state.password
-            }
-            return this.props.actions.signInRequest(credentials);
+            this.setState({isSuccess:true})
+            // console.log('signInRequest.start')
+            // const credentials = {
+            //     username: this.state.email,
+            //     password: this.state.password
+            // }
+            // return this.props.actions.signInRequest(credentials);
+            this.myFormRef.reset(); 
         })
         .then(() => {
-            browserHistory.push('/profile/talent/candidate')
+            // browserHistory.push('/profile/talent/candidate')
+            this.setState({isSuccess:true})
+            this.setState({ isLoading: false })
         })
         .catch((error) => {
             this.setState({ errorMessage: this.props.error })
@@ -271,21 +282,26 @@ class SignUp extends Component {
                             <p>Sign up with Google</p>
                         </SocialButton>
                     {/* }*/}
-                    { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
+                    {/* { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
                         <SocialButton onClick={() =>this.handleSocialLogin('facebook')}>
                             <img src={Images.facebook1} alt="facebook" />
                             <p>Sign up with Facebook</p>
-                        </SocialButton> }
+                        </SocialButton> } */}
                     </ButtonWrapper>
                     <CircleButton>Or</CircleButton>
-                    { this.props.hasExternalLogins && <CircleButton>Or</CircleButton> }
+                    {/* { this.props.hasExternalLogins && <CircleButton>Or</CircleButton> } */}
                     {/* { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink) */}
                     { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink)
                         ? <Text>Please fill in required fields</Text>
                         : null
                     }
+                    { this.state.isSuccess?
+                    <p class="sc-jqCOkK" style={successStyle}>Successfully Registered! Please check your Email.</p>
+                    :null
+                    }
+                    
                     { errorMessage ? <Text>{errorMessage}</Text> : null }
-                    <Form>
+                    <Form ref={(el) => this.myFormRef = el}>
                         <MuiThemeProvider>
                             <TextField
                                 name="fullName"
@@ -304,7 +320,7 @@ class SignUp extends Component {
                     { !isFullName && isValidate ?
                         <UnderLine error></UnderLine> : <UnderLine></UnderLine>
                     }
-                    <Form>
+                    <Form ref={(el) => this.myFormRef = el}>
                         <MuiThemeProvider>
                             <TextField
                                 name="email"
@@ -322,7 +338,7 @@ class SignUp extends Component {
                     { !isEmail && isValidate ?
                         <UnderLine error></UnderLine> : <UnderLine></UnderLine>
                     }
-                     <Form>
+                     <Form ref={(el) => this.myFormRef = el}>
                         <MuiThemeProvider>
                             <TextField
                                 name="city"
@@ -342,7 +358,7 @@ class SignUp extends Component {
                         ? <UnderLine error></UnderLine>
                         : <UnderLine></UnderLine>
                     }
-                    <Form>
+                    <Form ref={(el) => this.myFormRef = el}>
                         <MuiThemeProvider>
                             <TextField
                                 name="profileLink"

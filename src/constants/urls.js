@@ -1,4 +1,4 @@
-export const API_HOST = 'https://my.agentify.me'
+export const API_HOST = 'http://appointments.protoshopp.in'
 // export const API_HOST = 'http://localhost:3003'
 export const CLIENT_HOST = 'https://agentifyapp.herokuapp.com/talent/candidate'
 export const GOOGLE_KEY = "674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com"; 
