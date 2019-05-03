@@ -223,7 +223,7 @@ class SignUp extends Component {
         }
       };
     render() {
-        console.log(this.props);
+        // console.log(this.props);
         const { isEmail, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state             
         return (
             <Wrapper>                      
