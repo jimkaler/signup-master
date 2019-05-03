@@ -296,7 +296,7 @@ class SignUp extends Component {
                         : null
                     }
                     { this.state.isSuccess?
-                    <p class="sc-jqCOkK" style={successStyle}>Successfully Registered! Please check your Email.</p>
+                    <p className="sc-jqCOkK" style={successStyle}>Successfully Registered! Please check your Email.</p>
                     :null
                     }
                     
