@@ -13,7 +13,7 @@ import {
     Heading, 
     ButtonWrapper,
     SpinWrapper, 
-    CircleButton, 
+    // CircleButton, 
     Text, 
     Form, 
     UnderLine, 

@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import storage from 'redux-persist/lib/storage'
+// import storage from 'redux-persist/lib/storage'
 import auth from './auth'
 import talent from './talent'
 import employer from './employer'

@@ -57,16 +57,11 @@ const styles = {
         }         
     }
 }
-const spanStyle ={
-    display:'flex'
-}
-const pStyle ={
-    fontFamily:'NudistaLight'
-}
+
 const expires = new Date()
 expires.setDate(expires.getDate() + 14)
 const responseGoogle = (response) => {
-    console.log(response);
+    console.log("Automatically Signed In",response);
     if(response.error){
         console.log(response.error)
         cookies.set('isLoggedIn', false, { path: '/' });
@@ -85,16 +80,35 @@ const responseGoogle = (response) => {
         userInfo = JSON.stringify(userInfo);
         userInfo = JSON.parse(userInfo);
         // console.log(userInfo);
-        cookies.set('userInfo', userInfo, { path: '/' },expires,expires);
-        cookies.set('isLoggedIn', true, { path: '/' },expires,expires);
-        
-        
-    }
-    if(cookies.get('isLoggedIn')){
-        browserHistory.push('/profile/talent/person');
+
+        let bodyFormData = new FormData();
+        bodyFormData.append('Name',response.profileObj.name);
+        bodyFormData.append('Email',response.profileObj.email);
+        bodyFormData.append('Token',response.Zi.access_token);
+        axios({
+            method: 'post',
+            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SocialMediaLogin',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+            })
+            .then((response) => {
+                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                    browserHistory.push('/profile/talent/person');
+            }).catch((err) => {
+                console.log(err)
+                // this.setState({ 
+                //     isLoading: false,
+                //     isError:true,
+                //     isSuccess:false
+                //  });
+                 
+            });
+
+
     }
 
-        // console.log(cookies.get('userInfo'));
+        console.log("Running Function "+cookies.get('isLoggedIn'));
   }
 
 class SignIn extends Component {
@@ -113,12 +127,16 @@ class SignIn extends Component {
         // if(this.props.isLoggedIn){
         //     browserHistory.push('/profile/talent/candidate')
         // }
-        if(cookies.get('isLoggedIn')){
-            console.log(cookies.get('isLoggedIn'))
+        
+        if(cookies.get('isLoggedIn')==='undefined' || cookies.get('isLoggedIn')===''  || !cookies.get('isLoggedIn')){
+            console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
             //   browserHistory.push('/profile/talent/person');
-            browserHistory.push('/profile/talent/person');
+           
+        }else{
+            console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
+             browserHistory.push('/profile/talent/person');
         }
-        console.log('SignIn:componentWillMount');
+
         cookies.set('authType', 'talent', { path: '/' },expires,expires);
     }
 
@@ -127,9 +145,7 @@ class SignIn extends Component {
             // Request external login providers
             this.props.actions.getExternalLogins();
         }
-        console.log(cookies.get('userInfo'))
-        
-        console.log('SignIn:componentDidMount');
+        // console.log(cookies.get('userInfo'))
     }
 
     getValue = (e) => {
@@ -183,40 +199,13 @@ class SignIn extends Component {
                     })
                     cookies.set('userInfo',userInfo,{path:'/',expires:expires})
                     cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                    browserHistory.push('/profile/talent/person');
                 }else{
                     this.setState({
                         errorMessage: 'The user name or password is incorrect.',
                         isLoading:false 
                     })
                 }
-                // data:
-                //     data: Array(1)
-                //     0:
-                //     CreatedAt: "5/3/2019 5:41:49 AM"
-                //     Email: "jagdishprotolabz@gmail.com"
-                //     Id: 11
-                //     Location: "India"
-                //     Password: "123456789"
-                //     SocialLink: "facebook.com"
-                //     Token: ""
-                //     TransactionId: ""
-
-                // if(response.data.data[0].ret){
-                //     this.setState({ 
-                //         isError:false,
-                //         isSuccess:true,
-                //         isLoading: false,
-                //      });
-                //      setTimeout(function(){  browserHistory.push('signin/talent'); }, 3000);
-                // }else{
-                //     this.setState({ 
-                //         isError:true,
-                //         errorText:response.data.data[0].message,
-                //         isSuccess:false,
-                //         isLoading: false,
-                //         isOldPassword:false
-                //         });
-                // }
             }).catch((err) => {
                 this.setState({ 
                     isLoading: false,
@@ -226,19 +215,6 @@ class SignIn extends Component {
                  
             });
        
-        // const obj = {
-        //     username: this.state.email,
-        //     password: this.state.password
-        // }
-        // this.props.actions.reset();
-        // this.props.actions.signInRequest(obj)
-        //     .then(() => {
-        //         browserHistory.push('/profile/talent/candidate')
-        //     })
-        //     .catch((error) => {
-        //         this.setState({ errorMessage: 'The user name or password is incorrect.' })
-        //         this.setState({ isLoading: false })
-        //     })
     }
 
     handleSignUp = () => {
@@ -283,7 +259,7 @@ class SignIn extends Component {
                               )}
                             onFailure={responseGoogle}
                             cookiePolicy={'single_host_origin'}
-                            isSignedIn={'true'}
+                            // isSignedIn={'false'}
                             icon={'false'}
                         />
                     </div>

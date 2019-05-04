@@ -5,10 +5,10 @@ import TextField from 'material-ui/TextField'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux' 
 import ReactLoading from 'react-loading'
-import cookie from 'react-cookies'
+
 
 import Header from '../../../components/Header'
-import SocialButtons from '../../../components/ButtonJs'
+
 import { 
     Wrapper, 
     Content, 
@@ -28,11 +28,9 @@ import { signUpRequest, signInRequest, getExternalLogins, startExternalLogin } f
 import { reset } from '../../../reducers'
 import * as Validate from '../../../constants/validate'
 import { GoogleLogin } from 'react-google-login';
-import FacebookLogin from 'react-facebook-login';
-// import LinkedIn from 'react-linkedin-login';
 import LinkedIn from "linkedin-login-for-react";
 import Cookies from 'universal-cookie';
-import * as Types from '../../../constants/actionType';
+import axios from 'axios';
 
 const styles = {
     floatingLabelStyle: {
@@ -61,9 +59,6 @@ const responseGoogle = (response) => {
     console.log(response);
     if(response.error){
         console.log(response.error)
-        let userInfo = {
-            loggedIn:false
-        }
     }else{
         const expires = new Date()
         expires.setDate(expires.getDate() + 14)
@@ -80,27 +75,39 @@ const responseGoogle = (response) => {
         userInfo = JSON.parse(userInfo);
         // console.log(userInfo);
         cookies.set('userInfo', userInfo, { path: '/' });
-        // this.props.dispatch({
-        //     type: Types.GOT_EXTERNAL_LOGINS,
-        //     data: userInfo
-        // });
-        if(cookies.get('userInfo').loggedIn){
-            browserHistory.push('/profile/talent/person');
-        }
+        let bodyFormData = new FormData();
+        bodyFormData.append('Name',response.profileObj.name);
+        bodyFormData.append('Email',response.profileObj.email);
+        bodyFormData.append('Token',response.Zi.access_token);
+        axios({
+            method: 'post',
+            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SocialMediaLogin',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+            })
+            .then((response) => {
+                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                    browserHistory.push('/profile/talent/person');
+            }).catch((err) => {
+                console.log(err)
+                // this.setState({ 
+                //     isLoading: false,
+                //     isError:true,
+                //     isSuccess:false
+                //  });
+                 
+            });
+
         
     }
 
         console.log(cookies.get('userInfo').loggedIn);
   }
-  const responseFacebook = (response) => {
-    console.log(response);
-  }
-  const spanStyle ={
-      display:'flex'
-  }
-  const pStyle ={
-      fontFamily:'NudistaLight'
-  }
+//   const responseFacebook = (response) => {
+//     console.log(response);
+//   }
+
   const successStyle ={
     color: 'green',
     fontSize: '23px'
@@ -166,7 +173,7 @@ class SignUp extends Component {
     }
 
     handleSignUp = () => {                       
-        const { isEmail, isFullName,isCity,isProfileLink, isPassword, isConfirmPassword } = this.state
+        const { isEmail, isFullName,isCity,isProfileLink } = this.state
         this.setState({ isValidate: true })
         if(!isEmail || !isFullName || !isCity || !isProfileLink ) {
         // if(!isEmail || !isFullName || !isCity || !isProfileLink ) {

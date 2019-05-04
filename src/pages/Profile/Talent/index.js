@@ -14,10 +14,11 @@ class TalentPage extends Component {
         //     ? browserHistory.push('/signin/talent')
         //     : browserHistory.push('signup/employer');
         // }
-        if (!cookies.get('isLoggedIn') || cookies.get('isLoggedIn')==='undefined'){
+        if (!cookies.get('isLoggedIn') || cookies.get('isLoggedIn')==='undefined' || cookies.get('isLoggedIn')===''){
             cookies.get('authType') === 'talent'
             ? browserHistory.push('/signin/talent')
             : browserHistory.push('signup/employer');
+            console.log('COOKIES NOT ENABLED');
         }
     }
 

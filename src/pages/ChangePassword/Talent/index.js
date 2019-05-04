@@ -13,7 +13,7 @@ import {
     Heading, 
     ButtonWrapper,
     SpinWrapper, 
-    CircleButton, 
+    // CircleButton, 
     Text, 
     Form, 
     UnderLine, 
@@ -22,7 +22,7 @@ import {
 import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
 import { reset } from '../../../reducers'
-import { getPasswordResetToken, setNewPassword } from '../../../actions/auth'
+import { getPasswordResetToken } from '../../../actions/auth'
 import axios from 'axios';
 import * as urls from '../../../constants/urls';
 
@@ -106,11 +106,7 @@ class ChangePassword extends Component {
                 return
             }
             this.setState({ isLoading: true })
-            const obj = {
-                userId: this.state.uid,
-                oldPassword: this.state.oldPassword,
-                newPassword: this.state.newPassword,
-            }   
+            
             let bodyFormData = new FormData();
             bodyFormData.append('UserId',this.state.uid);
             bodyFormData.append('OldPassword',this.state.oldPassword);

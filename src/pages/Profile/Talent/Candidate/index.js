@@ -142,7 +142,7 @@ class Candidate extends Component {
                 });
             })
             .catch((error) => {
-                if (error.status == 404) {
+                if (error.status === 404) {
                     browserHistory.push('/profile/talent/person');
                     return;
                 }

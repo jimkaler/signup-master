@@ -1,7 +1,5 @@
 import * as Types from '../constants/actionType';
 import { request, requestApi } from '../services/request';
-import { browserHistory } from 'react-router';
-import * as urls from '../constants/urls';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 export function getPasswordResetToken(data) {
@@ -53,16 +51,16 @@ export function setNewPassword(data) {
 export function getExternalLogins() {
     return function (dispatch) {
         return new Promise((resolve, reject) => {
-            if (cookies.get('userInfo')!='') {
+            if (cookies.get('userInfo')!=='') {
                 console.log('User has registered');
                 let data = {
                     isLoggedIn:true,
                     hasRegistered:true,
                     fullName:cookies.get('name')
                 }
-                const externalLogins = {
-                    url:"/profile/talent/person"
-                }
+                // const externalLogins = {
+                //     url:"/profile/talent/person"
+                // }
                 let hasExternalLogins=1
                 console.log(data);
                 dispatch({
@@ -130,7 +128,7 @@ export function getUserInfo(headers){
                         resolve(user);
                     },
                     error => {
-                        console.log('getUserInfo.error', error);
+                        // console.log('getUserInfo.error', error);
                         reject(false);
                     }
                 )

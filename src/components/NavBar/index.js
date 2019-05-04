@@ -68,51 +68,51 @@ class Navigation extends Component {
     }
 
     toggleAction = () => {
-        if(cookies.get('authType')==='talent'){
-            if(cookies.get('isLoggedIn')){
-                if(this.state.isActive){
-                        this.setState({
-                            isActive: false
-                        })
-                        this.scrollingOnMobile()
-                        enableScrolling('desktop')      
-                    }         
-                } else {
-                    if(this.state.isActive){
-                        this.setState({
-                            isActive: false
-                        })
-                        this.scrollingOnMobile()
-                        enableScrolling('desktop')      
-                    }
-            }
-            browserHistory.push('/signin/talent')
-        }else{
-            browserHistory.push('/signup/employer')
-        }
-        // if(this.props.type === 'talent'){
-        //     if(this.props.isLoggedIn){                  
-        //         this.props.actions.reset()   
+        // if(cookies.get('authType')==='talent'){
+        //     if(cookies.get('isLoggedIn')){
         //         if(this.state.isActive){
-        //             this.setState({
-        //                 isActive: false
-        //             })
-        //             this.scrollingOnMobile()
-        //             enableScrolling('desktop')      
-        //         }         
-        //     } else {
-        //         if(this.state.isActive){
-        //             this.setState({
-        //                 isActive: false
-        //             })
-        //             this.scrollingOnMobile()
-        //             enableScrolling('desktop')      
-        //         }
-        //     }            
+        //                 this.setState({
+        //                     isActive: false
+        //                 })
+        //                 this.scrollingOnMobile()
+        //                 enableScrolling('desktop')      
+        //             }         
+        //         } else {
+        //             if(this.state.isActive){
+        //                 this.setState({
+        //                     isActive: false
+        //                 })
+        //                 this.scrollingOnMobile()
+        //                 enableScrolling('desktop')      
+        //             }
+        //     }
         //     browserHistory.push('/signin/talent')
-        // } else {
+        // }else{
         //     browserHistory.push('/signup/employer')
         // }
+        if(this.props.type === 'talent'){
+            if(cookies.get('isLoggedIn')){                
+                this.props.actions.reset()   
+                if(this.state.isActive){
+                    this.setState({
+                        isActive: false
+                    })
+                    this.scrollingOnMobile()
+                    enableScrolling('desktop')      
+                }         
+            } else {
+                if(this.state.isActive){
+                    this.setState({
+                        isActive: false
+                    })
+                    this.scrollingOnMobile()
+                    enableScrolling('desktop')      
+                }
+            }            
+            browserHistory.push('/signin/talent')
+        } else {
+            browserHistory.push('/signup/employer')
+        }
     }
 
     menu = () => {
@@ -131,7 +131,11 @@ class Navigation extends Component {
                 </Menu>
             )
     }
-
+    logout = () => {
+        // cookies.set('isLoggedIn',false, {path:'/'})
+        // browserHistory.push('/signin/talent')
+        console.log("Logout Button "+cookies.set('isLoggedIn'))
+    }
     loginButton = () => {
         const { save, edit } = this.props
         if(isMobile){
