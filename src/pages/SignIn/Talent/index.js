@@ -34,7 +34,11 @@ import {
 import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
 import axios from 'axios';
+import LinkedinSDK from 'react-linkedin-sdk'
 const cookies = new Cookies();
+const responseLinkedin = response => {
+    console.log(response)
+  }
 const styles = {
     floatingLabelStyle: {
         error : {
@@ -226,13 +230,16 @@ class SignIn extends Component {
         browserHistory.push('/get-password/talent');
     }
 
-    callbackLinkedIn = (error, code, redirectUri) => {
+    callbackLinkedIn = (error, code, redirectUri,data) => {
         if (error) {
           // signin failed
           console.log(error);
         } else {
             console.log(code);
             console.log(redirectUri);
+            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+            browserHistory.push('/profile/talent/person');
+
           // Obtain authorization token from linkedin api
           // see https://developer.linkedin.com/docs/oauth2 for more info
         }
@@ -246,6 +253,7 @@ class SignIn extends Component {
                     <Heading>Sign in now</Heading>
                    
                     <ButtonWrapper>
+                        
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}

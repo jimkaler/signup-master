@@ -23,6 +23,7 @@
     "react-ga": "^2.3.5",
     "react-google-login": "^5.0.4",
     "react-input-range": "^1.2.1",
+    "react-linkedin-sdk": "^1.0.12",
     "react-loading": "^0.1.4",
     "react-mapbox-gl": "^2.7.0",
     "react-mixpanel": "0.0.8",

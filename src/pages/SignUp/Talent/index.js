@@ -31,7 +31,8 @@ import { GoogleLogin } from 'react-google-login';
 import LinkedIn from "linkedin-login-for-react";
 import Cookies from 'universal-cookie';
 import axios from 'axios';
-
+const expires = new Date()
+expires.setDate(expires.getDate() + 14)
 const styles = {
     floatingLabelStyle: {
         error : {
@@ -225,8 +226,8 @@ class SignUp extends Component {
         } else {
             console.log(code);
             console.log(redirectUri);
-          // Obtain authorization token from linkedin api
-          // see https://developer.linkedin.com/docs/oauth2 for more info
+            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+            browserHistory.push('/profile/talent/person');
         }
       };
     render() {
