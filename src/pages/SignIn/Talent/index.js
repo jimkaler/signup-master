@@ -11,7 +11,7 @@ import { reset } from '../../../reducers'
 import { GoogleLogin } from 'react-google-login';
 import LinkedIn from "linkedin-login-for-react";
 import Cookies from 'universal-cookie';
-
+import {LinkedIn as LinkedInLog } from 'react-linkedin-login-oauth2';
 import Header from '../../../components/Header'
 import { 
     Wrapper, 
@@ -36,9 +36,9 @@ import * as Validate from '../../../constants/validate'
 import axios from 'axios';
 import LinkedinSDK from 'react-linkedin-sdk'
 const cookies = new Cookies();
-const responseLinkedin = response => {
-    console.log(response)
-  }
+
+
+
 const styles = {
     floatingLabelStyle: {
         error : {
@@ -126,15 +126,19 @@ class SignIn extends Component {
             errorMessage: null
         }
     }
-
+    responseLinkedin = (response) => {
+        console.log(response)
+      }
     componentWillMount() {
         // if(this.props.isLoggedIn){
         //     browserHistory.push('/profile/talent/candidate')
         // }
-        
-        if(cookies.get('isLoggedIn')==='undefined' || cookies.get('isLoggedIn')===''  || !cookies.get('isLoggedIn')){
+        if(!cookies.get('isLoggedIn')){
+            cookies.set('isLoggedIn',false,{path:'/'})
+        }
+        if(cookies.get('isLoggedIn')==='false'){
             console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
-            //   browserHistory.push('/profile/talent/person');
+              
            
         }else{
             console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
@@ -244,6 +248,21 @@ class SignIn extends Component {
           // see https://developer.linkedin.com/docs/oauth2 for more info
         }
       };
+      handleSuccessLog = (data) => {
+        // this.setState({
+        //   code: data.code,
+        //   errorMessage: '',
+        // });
+        console.log("LinkedIn Success ",data)
+      }
+    
+      handleFailureLog = (error) => {
+        // this.setState({
+        //   code: '',
+        //   errorMessage: error.errorMessage,
+        // });
+        console.log("LinkedIn Error ",error)
+      }
     render() {
         const { isEmail, isPassword, isValidate, isLoading, errorMessage } = this.state             
         return (
@@ -253,7 +272,36 @@ class SignIn extends Component {
                     <Heading>Sign in now</Heading>
                    
                     <ButtonWrapper>
-                        
+                    {/* <LinkedinSDK
+                        clientId="81rg1g83flx6m5"
+                        callBack={this.responseLinkedin}
+                        fields=":(id,num-connections,picture-urls::(original))"
+                        className={'className'}
+                        loginButtonText={'Login with Linkedin'}
+                        logoutButtonText={'Logout from Linkedin'}
+                        buttonType={'button'}                        
+                        getOAuthToken
+                    /> */}
+                    {/* <LinkedinSDK
+                        clientId="81rg1g83flx6m5"
+                        callBack={responseLinkedin}
+                        fields=":(id,num-connections,picture-urls::(original))"
+                        className={'className'}
+                        loginButtonText={'Login with Linkedin'}
+                        logoutButtonText={'Logout from Linkedin'}
+                        buttonType={'button'}
+                        getOAuthToken
+                    /> */}
+                    {/* <LinkedInLog
+                        clientId="81rg1g83flx6m5"
+                        onFailure={this.handleFailureLog}
+                        onSuccess={this.handleSuccessLog}
+                        redirectUri="http://localhost:3000/signin/talent"
+                        // scope="r_fullprofile r_emailaddress w_share"
+                        LinkedinPopUp
+                        >
+                        LinkedIn
+                    </LinkedInLog> */}
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}

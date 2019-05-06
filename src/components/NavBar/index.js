@@ -31,7 +31,9 @@ class Navigation extends Component {
             switched: false,            
         }      
     }
-    
+    componentWillMount(){
+        console.log(cookies.get('isLoggedIn'))
+    }
     scrollingOnMobile = () => {        
         if(this.state.isActive){
             enableScrolling('mobile')
@@ -132,9 +134,9 @@ class Navigation extends Component {
             )
     }
     logout = () => {
-        // cookies.set('isLoggedIn',false, {path:'/'})
-        // browserHistory.push('/signin/talent')
-        console.log("Logout Button "+cookies.set('isLoggedIn'))
+        cookies.set('isLoggedIn',false, {path:'/'})
+        browserHistory.push('/signin/talent')
+        console.log("Logout Button "+cookies.get('isLoggedIn'))
     }
     loginButton = () => {
         const { save, edit } = this.props
@@ -148,11 +150,26 @@ class Navigation extends Component {
             return (
                 <LoginButton save={save} edit={edit} onClick={() =>this.toggleAction()}>
                     <img src={Images.login} alt="login"/>
-                    <img src={Images.loginHover} alt="hover_login"/>                                                   
+                    <img src={Images.loginHover} alt="hover_login"/>                                                  
                 </LoginButton>
             )
     }
-
+    logoutButton = () => {
+        const { save, edit } = this.props
+        if(isMobile){
+            return (
+                <MobileLoginButton save={save} edit={edit} onClick={() =>this.logout()}>
+                    <img src={Images.logout} alt="login"/>                                                                       
+                </MobileLoginButton>
+            )
+        } else 
+            return (
+                <LoginButton save={save} edit={edit} onClick={() =>this.logout()}>
+                    <img src={Images.logout} alt="logout"/>
+                    <img src={Images.logoutHover} alt="hover_logout"/>                                                   
+                </LoginButton>
+            )
+    }
     render() {
         const { landing, edit, type, isEditable } = this.props
         return (
@@ -181,8 +198,11 @@ class Navigation extends Component {
                     <li><a onClick={() => this.navigationPage('/faq')}>FAQ</a></li>
                     <li><a onClick={() => window.location.assign('https://www.linkedin.com/company/agentify/')}>LinkedIn</a></li>
                     <li><a onClick={() => window.location.assign('https://www.facebook.com/agentify.me/')}>Facebook</a></li>
-                </Nav>  
-                { this.loginButton() }                              
+                </Nav>
+                {cookies.get('isLoggedIn')==='true'?
+                this.logoutButton():                            
+                 this.loginButton()     
+                }  
             </Wrapper>
         )
     }

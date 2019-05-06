@@ -133,10 +133,23 @@ class SignUp extends Component {
 
     componentWillMount() {
         // this.props.dispatch(getExternalLogins());
-        this.props.actions.getExternalLogins();
-        if(this.props.isLoggedIn){
-            browserHistory.push('/profile/talent/candidate')
+        // this.props.actions.getExternalLogins();
+        // if(this.props.isLoggedIn){
+        //     browserHistory.push('/profile/talent/candidate')
+        // }
+        if(!cookies.get('isLoggedIn')){
+            cookies.set('isLoggedIn',false,{path:'/'})
         }
+        if(cookies.get('isLoggedIn')==='false'){
+            console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
+              
+           
+        }else{
+            console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
+             browserHistory.push('/profile/talent/person');
+        }
+
+        cookies.set('authType', 'talent', { path: '/' },expires,expires);
     }
 
     componentDidMount() {
@@ -251,7 +264,7 @@ class SignUp extends Component {
                               )}
                             onFailure={responseGoogle}
                             cookiePolicy={'single_host_origin'}
-                            isSignedIn={'true'}
+                            // isSignedIn={'true'}
                             icon={'false'}
                         />
                     </div>
