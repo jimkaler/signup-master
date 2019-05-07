@@ -272,7 +272,7 @@ class SignIn extends Component {
                     <Heading>Sign in now</Heading>
                    
                     <ButtonWrapper>
-                    <LinkedinSDK
+                    {/* <LinkedinSDK
                         clientId="81rg1g83flx6m5"
                         callBack={this.responseLinkedin}
                         fields=":(id,num-connections,picture-urls::(original))"
@@ -281,7 +281,7 @@ class SignIn extends Component {
                         logoutButtonText={'Logout from Linkedin'}
                         buttonType={'button'}                        
                         getOAuthToken
-                    />
+                    /> */}
                     {/* <LinkedinSDK
                         clientId="81rg1g83flx6m5"
                         callBack={responseLinkedin}
@@ -292,7 +292,7 @@ class SignIn extends Component {
                         buttonType={'button'}
                         getOAuthToken
                     /> */}
-                    <LinkedInLog
+                    {/* <LinkedInLog
                         clientId="8129i2daae37nq"
                         onFailure={this.handleFailureLog}
                         onSuccess={this.handleSuccessLog}
@@ -301,7 +301,7 @@ class SignIn extends Component {
                         LinkedinPopUp
                         >
                         LinkedIn
-                    </LinkedInLog>
+                    </LinkedInLog> */}
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}
