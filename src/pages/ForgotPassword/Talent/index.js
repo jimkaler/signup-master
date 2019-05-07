@@ -23,7 +23,8 @@ import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
 import { reset } from '../../../reducers'
 import { getPasswordResetToken, setNewPassword } from '../../../actions/auth'
-
+import axios from 'axios';
+import * as urls from '../../../constants/urls';
 const styles = {
     floatingLabelStyle: {
         error : {
@@ -55,7 +56,9 @@ class ForgotPassword extends Component {
             isPassword: false,
             isConfirmPassword: false,
             isValidate: false,
-            isLoading: false
+            isLoading: false,
+            isCodeSent:false,
+            isError:false
         }
     }
 
@@ -84,45 +87,48 @@ class ForgotPassword extends Component {
     }
 
     handleSubmit = () => {
-        if (this.props.hasPasswordResetTokenSent) {
-            const { isEmail, isCode, isPassword, isConfirmPassword } = this.state
-            this.setState({ isValidate: true })
-            if(!isEmail || !isCode || !isPassword || !isConfirmPassword) {
-                return
-            }
-            this.setState({ isLoading: true })
-            const obj = {
-                email: this.state.email,
-                token: this.state.token,
-                newPassword: this.state.newPassword,
-                confirmPassword: this.state.confirmPassword
-            }   
-            this.props.actions.setNewPassword(obj)
-                .then(() => {
-                    browserHistory.push('/signin/talent');
-                })
-                .catch((error) => {
-                    this.setState({ isLoading: false })
-                })
-        } else {
+
             const { isEmail } = this.state
             this.setState({ isValidate: true })
             if(!isEmail) {
                 return
             }
             this.setState({ isLoading: true })
-            const obj = {
-                email: this.state.email,
-            }
-            this.props.actions.reset()
-            this.props.actions.getPasswordResetToken(obj)
-                .then(() => {
-                    this.setState({ isLoading: false })
+            // const obj = {
+            //     email: this.state.email,
+            // }
+            let bodyFormData = new FormData();
+            bodyFormData.append('Email',this.state.email);
+            bodyFormData.append('URL',window.location.origin+"/talent-change-password");
+            axios({
+                method: 'post',
+                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SendEmail',
+                data: bodyFormData,
+                config: { headers: {'Content-Type': 'multipart/form-data' }}
                 })
-                .catch((error) => {
-                    this.setState({ isLoading: false })
-                })
-        }
+                .then((response) => {
+                    console.log(response)
+                    this.setState({ 
+                        isLoading: false,
+                        isCodeSent:true
+                     })
+                }).catch((err) => {
+                    console.log(err)
+                    this.setState({ 
+                        isLoading: false,
+                        isError:true,
+                     });
+                     
+                });
+
+            // this.props.actions.reset()
+            // this.props.actions.getPasswordResetToken(obj)
+            //     .then(() => {
+            //         this.setState({ isLoading: false })
+            //     })
+            //     .catch((error) => {
+            //         this.setState({ isLoading: false })
+            //     })
     }
 
     render() {
@@ -194,20 +200,17 @@ class ForgotPassword extends Component {
             <Wrapper>                      
                 <Header/>                       
                 <Content>
-                    { this.props.hasPasswordResetTokenSent
-                        ? <Heading>Verification code was sent to the email address.</Heading>
-                        : <Heading>Forgot your password?</Heading>
+                <Heading>Forgot your password?</Heading>
+                    { this.state.isCodeSent?
+                        <Heading>Verification code was sent to the email address.</Heading>:null
                     }
-                    { (!this.props.hasPasswordResetTokenSent) && isValidate && (!isEmail)
-                        ? <Text>Please fill in Email</Text>
-                        : null
-                    }
-                    { this.props.hasPasswordResetTokenSent && isValidate && (!isEmail || !isPassword || !isConfirmPassword)
+                    
+                    { isValidate && !isEmail 
                         ? <Text>Please fill in required fields</Text>
                         : null
                     }
-                    { this.props.error ? <Text>{this.props.error}</Text> : null }
-                    <Form>
+                    { this.state.isError ? <Text>Email does not exist!</Text> : null }
+                    <Form style={{ marginTop:"20px" }}>
                         <MuiThemeProvider>
                             <TextField
                                 name="email"
@@ -225,7 +228,7 @@ class ForgotPassword extends Component {
                     { !isEmail && isValidate ?
                         <UnderLine error></UnderLine> : <UnderLine></UnderLine>
                     }
-                    { this.props.hasPasswordResetTokenSent ? newPasswordElement : null }
+                    {/* { this.props.hasPasswordResetTokenSent ? newPasswordElement : null } */}
                     { isLoading ? <SpinWrapper><ReactLoading type="spinningBubbles" color="#4cbf69" height='70' width='70' /></SpinWrapper> :
                         <ButtonWrapper signup>
                             {

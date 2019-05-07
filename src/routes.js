@@ -19,15 +19,17 @@ import Contact from './pages/Contact'
 import Privacy from './pages/Privacy'
 import FAQ from './pages/FAQ'
 import TCA from './pages/TCA'
+import LinkedInPopUp from '../node_modules/react-linkedin-login-oauth2/lib/LinkedInPopUp';
 
 export default (
     <Route path="/" component={ App }>
         <IndexRoute component={ Home } />
         <Route path="/home" component={ Home } />
         <Route path="/signin/talent" component={ TalentSignIn } />
+        <Route path="/linkedin" component={ LinkedInPopUp } />
         <Route path="/signup/talent" component={ TalentSignUp } />
         <Route path="/get-password/talent" component={ TalentForgotPassword } />
-        <Route path="/change-password/talent" component={ TalentChangePassword } />
+        <Route path="/talent-change-password" component={ TalentChangePassword } />
         <Route path="/signup/employer" component={ EmployerSignUp } />
         <Route path="/profile/talent" component={ TalentPage }>
             <IndexRoute component={ Person } />

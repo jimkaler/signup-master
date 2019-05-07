@@ -193,15 +193,27 @@ class SignUp extends Component {
         // if(!isEmail || !isFullName || !isCity || !isProfileLink ) {
             return
         }
+        var rand = function() {
+            return Math.random().toString(36).substr(2); // remove `0.`
+        };
+        
+        var token = function() {
+            return rand() + rand() + rand() + rand(); // to make it longer
+        };
+        var trans = function() {
+            return rand() + rand() // to make it longer
+        };
+        
+        
         this.setState({ isLoading: true })
         const obj = {
             name:this.state.fullName,
             email: this.state.email,
-            token:"",
-            transactionId:"",
+            token:token(),
+            transactionId:trans(),
             city:this.state.city,
             socialLink:this.state.profileLink,
-            passwordUrl:window.location.origin+"/change-password/talent"
+            passwordUrl:window.location.origin+"/talent-change-password"
         }   
         this.props.actions.reset()     
         this.props.actions.signUpRequest(obj)
@@ -244,7 +256,7 @@ class SignUp extends Component {
         }
       };
     render() {
-        const { isEmail, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state             
+        const { isEmail, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state
         return (
             <Wrapper>                      
                 <Header/>                       

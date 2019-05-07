@@ -272,7 +272,7 @@ class SignIn extends Component {
                     <Heading>Sign in now</Heading>
                    
                     <ButtonWrapper>
-                    {/* <LinkedinSDK
+                    <LinkedinSDK
                         clientId="81rg1g83flx6m5"
                         callBack={this.responseLinkedin}
                         fields=":(id,num-connections,picture-urls::(original))"
@@ -281,7 +281,7 @@ class SignIn extends Component {
                         logoutButtonText={'Logout from Linkedin'}
                         buttonType={'button'}                        
                         getOAuthToken
-                    /> */}
+                    />
                     {/* <LinkedinSDK
                         clientId="81rg1g83flx6m5"
                         callBack={responseLinkedin}
@@ -292,16 +292,16 @@ class SignIn extends Component {
                         buttonType={'button'}
                         getOAuthToken
                     /> */}
-                    {/* <LinkedInLog
-                        clientId="81rg1g83flx6m5"
+                    <LinkedInLog
+                        clientId="8129i2daae37nq"
                         onFailure={this.handleFailureLog}
                         onSuccess={this.handleSuccessLog}
-                        redirectUri="http://localhost:3000/signin/talent"
-                        // scope="r_fullprofile r_emailaddress w_share"
+                        redirectUri={`${window.location.origin}/linkedin`}
+                        scope="r_liteprofile r_emailaddress"
                         LinkedinPopUp
                         >
                         LinkedIn
-                    </LinkedInLog> */}
+                    </LinkedInLog>
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}

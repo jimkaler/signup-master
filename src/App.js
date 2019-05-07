@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux'
 import { reset } from './reducers'
 import { getUserInfo, registerExternalUser } from './actions/auth'
 import Cookies from 'universal-cookie';
+import axios from 'axios';
 const cookies = new Cookies();
 class App extends Component {
     constructor(props){
@@ -18,6 +19,35 @@ class App extends Component {
     }
 
     componentWillMount() {
+
+        let bodyFormData = new FormData();
+        bodyFormData.append('grant_type','authorization_code');
+        bodyFormData.append('code','AQT4g_IegUbOnLh5pf-HGgCBM68E3cjhBKl6m8AST7xeIz6bFkwOxV68x0iNyMkeoN6DhOnCwWF-9_PR0m82VKljlWsd1S81dbJ3PhV1RQ5r1Yghiz6bA1IP5xIMm3LutWxR8j_pHh1x4E24E-YHgRm-JEYtHf4j6syJ4RHBqrrGVbM3cbeKRAmrwiRupw');
+        bodyFormData.append('redirect_uri','http://localhost:3000/signin/talent');
+        bodyFormData.append('client_id','81rg1g83flx6m5');
+        bodyFormData.append('client_secret','xNy9yvg0R7ub4S46');
+
+        axios({
+            method: 'post',
+            url: 'https://cors-anywhere.herokuapp.com/https://linkedin.com/oauth/v2/accessToken',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': ' application/x-www-form-urlencoded' }}
+            })
+            .then((response) => {
+                console.log(response);
+                    // cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                    // cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                    // browserHistory.push('/profile/talent/person');
+            }).catch((err) => {
+                console.log(err)
+                // this.setState({ 
+                //     isLoading: false,
+                //     isError:true,
+                //     isSuccess:false
+                //  });
+                 
+            });
+
         // cookies.remove('isLoggedIn', { path: '/' })
         console.log("App Cokies "+cookies.get('isLoggedIn'))
         const hash = window.location.hash;
