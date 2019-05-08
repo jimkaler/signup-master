@@ -338,6 +338,7 @@ class SignIn extends Component {
                                 </div>
                                 
                               )}
+                            redirectUri={window.location.origin}
                             onFailure={responseGoogle}
                             cookiePolicy={'single_host_origin'}
                             // isSignedIn={'false'}
