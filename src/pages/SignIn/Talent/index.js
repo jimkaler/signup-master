@@ -344,7 +344,7 @@ class SignIn extends Component {
                             icon={'false'}
                         />
                     </div>
-                    {/* Old L`inkedIN*/}
+                                
                     {/* <div className="sc-jbKcbu linKDN">
                         <LinkedInLog
                             clientId="8129i2daae37nq"
