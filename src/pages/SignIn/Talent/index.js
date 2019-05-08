@@ -344,7 +344,8 @@ class SignIn extends Component {
                             icon={'false'}
                         />
                     </div>
-                    <div className="sc-jbKcbu linKDN">
+                    {/* Old LinkedIN*/}
+                    {/* <div className="sc-jbKcbu linKDN">
                         <LinkedInLog
                             clientId="8129i2daae37nq"
                             onFailure={this.handleFailureLog}
@@ -355,7 +356,7 @@ class SignIn extends Component {
                             >
                             Sign up With LinkedIn
                         </LinkedInLog>
-                    </div>
+                    </div> */}
                     {/* <FacebookLogin
                         appId="353197588660922"
                         autoLoad={true}
@@ -364,7 +365,7 @@ class SignIn extends Component {
                         callback={responseFacebook} 
                     /> */}
 
-                     {/* <div className="sc-jbKcbu linKDN">
+                     <div className="sc-jbKcbu linKDN">
                         <LinkedIn
                             clientId="81rg1g83flx6m5"
                             callback={this.callbackLinkedIn}
@@ -375,7 +376,7 @@ class SignIn extends Component {
                         <img src={Images.google} alt="google" />
                             <p>Sign up with Google</p>
                         </LinkedIn>
-                     </div> */}
+                     </div>
                      
                     {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
                         <SocialButton style={{ display:"none" }} google onClick={() =>this.handleSocialLogin('google')}>
