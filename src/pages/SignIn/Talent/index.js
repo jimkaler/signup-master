@@ -9,7 +9,6 @@ import * as urls from '../../../constants/urls'
 import { getExternalLogins, signInRequest, startExternalLogin } from '../../../actions/auth'
 import { reset } from '../../../reducers'
 import { GoogleLogin } from 'react-google-login';
-import LinkedIn from "linkedin-login-for-react";
 import Cookies from 'universal-cookie';
 import {LinkedIn as LinkedInLog } from 'react-linkedin-login-oauth2';
 import Header from '../../../components/Header'
@@ -34,7 +33,6 @@ import {
 import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
 import axios from 'axios';
-import LinkedinSDK from 'react-linkedin-sdk'
 const cookies = new Cookies();
 
 

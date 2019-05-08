@@ -28,7 +28,6 @@ import { signUpRequest, signInRequest, getExternalLogins, startExternalLogin } f
 import { reset } from '../../../reducers'
 import * as Validate from '../../../constants/validate'
 import { GoogleLogin } from 'react-google-login';
-import LinkedIn from "linkedin-login-for-react";
 import Cookies from 'universal-cookie';
 import axios from 'axios';
 const expires = new Date()
