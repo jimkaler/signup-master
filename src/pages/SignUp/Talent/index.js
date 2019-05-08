@@ -207,15 +207,15 @@ class SignUp extends Component {
         
         
         this.setState({ isLoading: true })
-        const obj = {
-            name:this.state.fullName,
-            email: this.state.email,
-            token:token(),
-            transactionId:trans(),
-            city:this.state.city,
-            socialLink:this.state.profileLink,
-            passwordUrl:window.location.origin+"/talent-change-password"
-        }   
+        // const obj = {
+        //     name:this.state.fullName,
+        //     email: this.state.email,
+        //     token:token(),
+        //     transactionId:trans(),
+        //     city:this.state.city,
+        //     socialLink:this.state.profileLink,
+        //     passwordUrl:window.location.origin+"/talent-change-password"
+        // }   
         this.props.actions.reset()   
 
         let bodyFormData = new FormData();
