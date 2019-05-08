@@ -65,9 +65,7 @@ const styles = {
 const expires = new Date()
 expires.setDate(expires.getDate() + 14)
 const responseGoogle = (response) => {
-    // console.log("Automatically Signed In",response);
     if(response.error){
-        // console.log(response.error)
         cookies.set('isLoggedIn', false, { path: '/' });
     }else{
         const expires = new Date()
@@ -83,7 +81,6 @@ const responseGoogle = (response) => {
         }
         userInfo = JSON.stringify(userInfo);
         userInfo = JSON.parse(userInfo);
-        // console.log(userInfo);
 
         let bodyFormData = new FormData();
         bodyFormData.append('Name',response.profileObj.name);
@@ -101,12 +98,7 @@ const responseGoogle = (response) => {
                     browserHistory.push('/profile/talent/person');
             }).catch((err) => {
                 console.log(err)
-                // this.setState({ 
-                //     isLoading: false,
-                //     isError:true,
-                //     isSuccess:false
-                //  });
-                 
+                
             });
 
 
@@ -130,9 +122,7 @@ class SignIn extends Component {
         console.log(response)
       }
     componentWillMount() {
-        // if(this.props.isLoggedIn){
-        //     browserHistory.push('/profile/talent/candidate')
-        // }
+        
         if(!cookies.get('isLoggedIn')){
             cookies.set('isLoggedIn',false,{path:'/'})
         }
@@ -150,10 +140,10 @@ class SignIn extends Component {
 
     componentDidMount() {
         if (!this.props.hasExternalLogins) {
-            // Request external login providers
+           
             this.props.actions.getExternalLogins();
         }
-        // console.log(cookies.get('userInfo'))
+        
     }
 
     getValue = (e) => {
@@ -235,20 +225,6 @@ class SignIn extends Component {
         browserHistory.push('/get-password/talent');
     }
 
-    callbackLinkedIn = (error, code, redirectUri,data) => {
-        if (error) {
-          // signin failed
-          console.log(error);
-        } else {
-            // console.log(code);
-            // console.log(redirectUri);
-            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
-            browserHistory.push('/profile/talent/person');
-
-          // Obtain authorization token from linkedin api
-          // see https://developer.linkedin.com/docs/oauth2 for more info
-        }
-      };
       handleSuccessLog = (data) => {
         // console.log(data.code)
         var redirect = window.location.origin+"/linkedin";
@@ -268,8 +244,6 @@ class SignIn extends Component {
                     })
                      
                 });
-                // console.log('cookies token: '+cookies.get('acT'));
-
                 // 3 Get LiteProfile
 
                function getLiteProfile(token){
@@ -423,7 +397,7 @@ class SignIn extends Component {
                     /> */}
                      <div className="sc-jbKcbu linKDN">
                      <LinkedInLog
-                        clientId="8129i2daae37nq"
+                        clientId={urls.LINKEDIN_KEY}
                         onFailure={this.handleFailureLog}
                         onSuccess={this.handleSuccessLog}
                         redirectUri={`${window.location.origin}/linkedin`}
@@ -432,16 +406,6 @@ class SignIn extends Component {
                         >
                         Sign up With LinkedIn
                     </LinkedInLog>
-                        {/* <LinkedIn
-                            clientId="81rg1g83flx6m5"
-                            callback={this.callbackLinkedIn}
-                            text="Sign up With LinkedIn"
-                            img={Images.google}
-                            alt={'linkedIn'}
-                        >
-                        <img src={Images.google} alt="google" />
-                            <p>Sign up with Google</p>
-                        </LinkedIn> */}
                      </div>
                      
                     {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}

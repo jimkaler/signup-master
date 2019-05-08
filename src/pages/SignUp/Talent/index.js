@@ -5,7 +5,7 @@ import TextField from 'material-ui/TextField'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux' 
 import ReactLoading from 'react-loading'
-
+import {LinkedIn as LinkedInLog } from 'react-linkedin-login-oauth2';
 
 import Header from '../../../components/Header'
 
@@ -133,11 +133,7 @@ class SignUp extends Component {
     }
 
     componentWillMount() {
-        // this.props.dispatch(getExternalLogins());
-        // this.props.actions.getExternalLogins();
-        // if(this.props.isLoggedIn){
-        //     browserHistory.push('/profile/talent/candidate')
-        // }
+
         if(!cookies.get('isLoggedIn')){
             cookies.set('isLoggedIn',false,{path:'/'})
         }
@@ -178,12 +174,7 @@ class SignUp extends Component {
         if (name === 'profileLink') {
             this.setState({ isProfileLink: Validate.socialValidate(value)})
         }
-        // if (name === 'password') {
-        //     this.setState({ isPassword: Validate.passwordValidate(value)})
-        // }
-        // if (name === 'confirmPassword') {
-        //     this.setState({ isConfirmPassword: Validate.confirmPasswordValidate(value, this.state.password)})
-        // }
+
         e.preventDefault()
     }
 
@@ -207,15 +198,7 @@ class SignUp extends Component {
         
         
         this.setState({ isLoading: true })
-        // const obj = {
-        //     name:this.state.fullName,
-        //     email: this.state.email,
-        //     token:token(),
-        //     transactionId:trans(),
-        //     city:this.state.city,
-        //     socialLink:this.state.profileLink,
-        //     passwordUrl:window.location.origin+"/talent-change-password"
-        // }   
+        
         this.props.actions.reset()   
 
         let bodyFormData = new FormData();
@@ -265,17 +248,122 @@ class SignUp extends Component {
         window.location.href = externalLoginUrl;
     }
 
-    callbackLinkedIn = (error, code, redirectUri) => {
-        if (error) {
-          // signin failed
-          console.log(error);
-        } else {
-            console.log(code);
-            console.log(redirectUri);
-            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
-            browserHistory.push('/profile/talent/person');
-        }
-      };
+    handleSuccessLog = (data) => {
+        // console.log(data.code)
+        var redirect = window.location.origin+"/linkedin";
+        // 2 Get Access Token
+            axios({
+                method: 'post',
+                url: `https://cors-anywhere.herokuapp.com/https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${data.code}&redirect_uri=${redirect}&client_id=8129i2daae37nq&client_secret=IdU7fiZp1Aii7AAG`,
+                })
+                .then((response) => {
+                        cookies.set('acT',response.data.access_token,{path:'/',expires:expires})
+                        getLiteProfile(response.data.access_token);
+                }).catch((err) => {
+                    console.log(err)
+                    this.setState({
+                        errorMessage: 'Something went wrong',
+                        isLoading:false 
+                    })
+                     
+                });
+                // 3 Get LiteProfile
+
+               function getLiteProfile(token){
+                    axios({
+                    method: 'GET',
+                    url: `https://cors-anywhere.herokuapp.com/https://api.linkedin.com/v2/me?projection=(firstName,lastName)
+                    &oauth2_access_token=${token}`
+                    })
+                    .then((response) => {
+                        let localeCountry = response.data.firstName.preferredLocale.country;
+                        let localeLang = response.data.firstName.preferredLocale.language;
+                        let locale = localeLang+"_"+localeCountry;
+                        let fn = response.data.firstName.localized[locale];
+                        let ln = response.data.lastName.localized[locale]; 
+                        cookies.set('LinkFN',fn,{path:'/',expires:expires});
+                        cookies.set('LinkLN',ln,{path:'/',expires:expires});
+                        cookies.set('LinkTN',cookies.get('acT'),{path:'/',expires:expires});
+                        cookies.set('LinkID',cookies.get('acT'),{path:'/',expires:expires});
+                          getEmail();
+
+                    }).catch((err) => {
+                        console.log(err)
+                        // this.setState({
+                        //     errorMessage: 'Something went wrong',
+                        //     isLoading:false 
+                        // })
+                         
+                    });
+                }
+               // 4 Get Email address
+
+              function getEmail(){ 
+                axios({
+                method: 'GET',
+                url: `https://cors-anywhere.herokuapp.com/https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,type,handle~))&oauth2_access_token=${cookies.get('acT')}`,
+                async:true
+                })
+                .then((response) => {
+                    var json = JSON.parse(JSON.stringify(response.data).split('"handle~":').join('"email":'));
+                  
+                    let email = json.elements[0].email.emailAddress;
+                  
+                    let userInfo = {
+                        log:cookies.get('LinkTN'),
+                        email:email,
+                        firstName:cookies.get('LinkFN'),
+                        lastName:cookies.get('LinkLN'),
+                        image:'',
+                        id:cookies.get('LinkID'),
+                        name:cookies.get('LinkFN')+" "+cookies.get('LinkLN'),
+                    }
+                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                    registerUser(email)
+                }).catch((err) => {
+                    console.log(err)
+                    // this.setState({
+                    //     errorMessage: 'Something went wrong',
+                    //     isLoading:false 
+                    // })
+                     
+                });   
+            }
+            function registerUser(email){
+        
+                let bodyFormData = new FormData();
+                bodyFormData.append('Name',cookies.get('LinkFN')+" "+cookies.get('LinkLN'));
+                bodyFormData.append('Email',email);
+                bodyFormData.append('Token',cookies.get('LinkTN'));
+                axios({
+                    method: 'post',
+                    url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SocialMediaLogin',
+                    data: bodyFormData,
+                    config: { headers: {'Content-Type': 'multipart/form-data' }}
+                    })
+                    .then((response) => {
+                        browserHistory.push('/profile/talent/person');
+                    }).catch((err) => {
+                        console.log(err)
+                        // this.setState({ 
+                        //     isLoading: false,
+                        //     isError:true,
+                        //     isSuccess:false
+                        // });
+                        
+                    });
+            }
+               
+      }
+    
+      handleFailureLog = (error) => {
+        // this.setState({
+        //   code: '',
+        //   errorMessage: error.errorMessage,
+        // });
+        console.log("LinkedIn Error ",error)
+      }
     render() {
         const { isEmail, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state
         return (
@@ -308,18 +396,19 @@ class SignUp extends Component {
                         // onClick={componentClicked}
                         callback={responseFacebook} 
                     /> */}
-                     <div className="sc-jbKcbu linKDN">
-                        <LinkedIn
-                            clientId="81rg1g83flx6m5"
-                            callback={this.callbackLinkedIn}
-                            text="Sign up With LinkedIn"
-                            img={Images.google}
-                            alt={'linkedIn'}
+                    <div className="sc-jbKcbu linKDN">
+                     <LinkedInLog
+                        clientId={urls.LINKEDIN_KEY}
+                        onFailure={this.handleFailureLog}
+                        onSuccess={this.handleSuccessLog}
+                        redirectUri={`${window.location.origin}/linkedin`}
+                        scope="r_liteprofile r_emailaddress"
+                        LinkedinPopUp
                         >
-                        <img src={Images.google} alt="google" />
-                            <p>Sign up with Google</p>
-                        </LinkedIn>
+                        Sign up With LinkedIn
+                    </LinkedInLog>
                      </div>
+                     
                     {/* <SocialButtons
                     provider='google'
                     appId='674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com'
