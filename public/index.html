@@ -26,6 +26,12 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Agentify</title>
+    <script>
+      var host = "www.agentifyapp.herokuapp.com" || "agentifyapp.herokuapp.com";
+      if ((host == window.location.host) && (window.location.protocol != "https:")){
+      window.location.protocol = "https";
+      }
+      </script>
     <style>
     .linKDN{
         display: -webkit-box;
