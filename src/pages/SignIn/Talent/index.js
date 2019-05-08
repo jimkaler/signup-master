@@ -65,9 +65,9 @@ const styles = {
 const expires = new Date()
 expires.setDate(expires.getDate() + 14)
 const responseGoogle = (response) => {
-    console.log("Automatically Signed In",response);
+    // console.log("Automatically Signed In",response);
     if(response.error){
-        console.log(response.error)
+        // console.log(response.error)
         cookies.set('isLoggedIn', false, { path: '/' });
     }else{
         const expires = new Date()
@@ -207,7 +207,7 @@ class SignIn extends Component {
                     })
                     cookies.set('userInfo',userInfo,{path:'/',expires:expires})
                     cookies.set('isLoggedIn',true,{path:'/',expires:expires})
-                    console.log(cookies.get('isLoggedIn'));
+                    // console.log(cookies.get('isLoggedIn'));
                     browserHistory.push('/profile/talent/person');
                 }else{
                     this.setState({
@@ -268,7 +268,7 @@ class SignIn extends Component {
                     })
                      
                 });
-                console.log('cookies token'+cookies.get('acT'));
+                // console.log('cookies token'+cookies.get('acT'));
                 // Third step of Authentication
 
                 axios({
@@ -327,16 +327,6 @@ class SignIn extends Component {
                         buttonType={'button'}
                         getOAuthToken
                     /> */}
-                    <LinkedInLog
-                        clientId="8129i2daae37nq"
-                        onFailure={this.handleFailureLog}
-                        onSuccess={this.handleSuccessLog}
-                        redirectUri={`${window.location.origin}/linkedin`}
-                        scope="r_liteprofile r_emailaddress"
-                        LinkedinPopUp
-                        >
-                        LinkedIn
-                    </LinkedInLog>
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}
@@ -354,6 +344,18 @@ class SignIn extends Component {
                             icon={'false'}
                         />
                     </div>
+                    <div className="sc-jbKcbu linKDN">
+                        <LinkedInLog
+                            clientId="8129i2daae37nq"
+                            onFailure={this.handleFailureLog}
+                            onSuccess={this.handleSuccessLog}
+                            redirectUri={`${window.location.origin}/linkedin`}
+                            scope="r_liteprofile r_emailaddress"
+                            LinkedinPopUp
+                            >
+                            Sign up With LinkedIn
+                        </LinkedInLog>
+                    </div>
                     {/* <FacebookLogin
                         appId="353197588660922"
                         autoLoad={true}
@@ -361,7 +363,8 @@ class SignIn extends Component {
                         // onClick={componentClicked}
                         callback={responseFacebook} 
                     /> */}
-                     <div className="sc-jbKcbu linKDN">
+
+                     {/* <div className="sc-jbKcbu linKDN">
                         <LinkedIn
                             clientId="81rg1g83flx6m5"
                             callback={this.callbackLinkedIn}
@@ -372,7 +375,7 @@ class SignIn extends Component {
                         <img src={Images.google} alt="google" />
                             <p>Sign up with Google</p>
                         </LinkedIn>
-                     </div>
+                     </div> */}
                      
                     {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
                         <SocialButton style={{ display:"none" }} google onClick={() =>this.handleSocialLogin('google')}>
