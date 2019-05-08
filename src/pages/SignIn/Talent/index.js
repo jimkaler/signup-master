@@ -344,19 +344,6 @@ class SignIn extends Component {
                             icon={'false'}
                         />
                     </div>
-                                
-                    {/* <div className="sc-jbKcbu linKDN">
-                        <LinkedInLog
-                            clientId="8129i2daae37nq"
-                            onFailure={this.handleFailureLog}
-                            onSuccess={this.handleSuccessLog}
-                            redirectUri={`${window.location.origin}/linkedin`}
-                            scope="r_liteprofile r_emailaddress"
-                            LinkedinPopUp
-                            >
-                            Sign up With LinkedIn
-                        </LinkedInLog>
-                    </div> */}
                     {/* <FacebookLogin
                         appId="353197588660922"
                         autoLoad={true}
@@ -364,9 +351,18 @@ class SignIn extends Component {
                         // onClick={componentClicked}
                         callback={responseFacebook} 
                     /> */}
-
                      <div className="sc-jbKcbu linKDN">
-                        <LinkedIn
+                     <LinkedInLog
+                        clientId="8129i2daae37nq"
+                        onFailure={this.handleFailureLog}
+                        onSuccess={this.handleSuccessLog}
+                        redirectUri={`${window.location.origin}/linkedin`}
+                        scope="r_liteprofile r_emailaddress"
+                        LinkedinPopUp
+                        >
+                        Sign up With LinkedIn
+                    </LinkedInLog>
+                        {/* <LinkedIn
                             clientId="81rg1g83flx6m5"
                             callback={this.callbackLinkedIn}
                             text="Sign up With LinkedIn"
@@ -375,7 +371,7 @@ class SignIn extends Component {
                         >
                         <img src={Images.google} alt="google" />
                             <p>Sign up with Google</p>
-                        </LinkedIn>
+                        </LinkedIn> */}
                      </div>
                      
                     {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
