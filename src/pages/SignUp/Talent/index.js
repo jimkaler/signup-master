@@ -127,7 +127,8 @@ class SignUp extends Component {
             isValidate: false,
             isLoading: false,
             errorMessage: null,
-            isSuccess:false
+            isSuccess:false,
+            state:false
         }
     }
 
