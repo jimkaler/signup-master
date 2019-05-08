@@ -162,7 +162,7 @@ class SignUp extends Component {
     }
 
     getValue = (e) => {
-        console.log(window.location.origin);
+
         let { name, value } = e.target
         this.setState({ [name]: value})
         if (name === 'email') {
@@ -187,9 +187,9 @@ class SignUp extends Component {
     }
 
     handleSignUp = () => {                       
-        const { isEmail, isFullName,isCity,isProfileLink } = this.state
+        const { isEmail, isFullName,isCity } = this.state
         this.setState({ isValidate: true })
-        if(!isEmail || !isFullName || !isCity || !isProfileLink ) {
+        if(!isEmail || !isFullName || !isCity ) {
         // if(!isEmail || !isFullName || !isCity || !isProfileLink ) {
             return
         }
@@ -215,27 +215,47 @@ class SignUp extends Component {
             socialLink:this.state.profileLink,
             passwordUrl:window.location.origin+"/talent-change-password"
         }   
-        this.props.actions.reset()     
-        this.props.actions.signUpRequest(obj)
-        .then(() => {
-            this.setState({isSuccess:true})
-            // console.log('signInRequest.start')
-            // const credentials = {
-            //     username: this.state.email,
-            //     password: this.state.password
-            // }
-            // return this.props.actions.signInRequest(credentials);
-            this.myFormRef.reset(); 
-        })
-        .then(() => {
-            // browserHistory.push('/profile/talent/candidate')
-            this.setState({isSuccess:true})
-            this.setState({ isLoading: false })
-        })
-        .catch((error) => {
-            this.setState({ errorMessage: this.props.error })
-            this.setState({ isLoading: false })
-        })
+        this.props.actions.reset()   
+
+        let bodyFormData = new FormData();
+        bodyFormData.append('Name',this.state.fullName);
+        bodyFormData.append('Email',this.state.email);
+        bodyFormData.append('Token',token());
+        bodyFormData.append('transactionId',trans());
+        bodyFormData.append('city',this.state.city);
+        bodyFormData.append('socialLink',this.state.profileLink);
+        bodyFormData.append('passwordUrl',window.location.origin+"/talent-change-password");
+        axios({
+            method: 'post',
+            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserRegistration',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+            })
+            .then((response) => {
+                console.log(response.data.data[0])
+                if(response.data.data[0].ret==='1'){
+                    this.setState({ 
+                        isLoading: false,
+                        isError:false,
+                        isSuccess:true
+                    });
+                }else{
+                    this.setState({ 
+                        isLoading: false,
+                        errorMessage:response.data.data[0].message,
+                        isSuccess:false
+                    });
+                }
+            }).catch((err) => {
+                console.log(err)
+                this.setState({ 
+                    isLoading: false,
+                    isError:true,
+                    isSuccess:false
+                 });
+                 
+            });
+
     }
 
     handleSocialLogin = (social) => {
@@ -323,7 +343,7 @@ class SignUp extends Component {
                     <CircleButton>Or</CircleButton>
                     {/* { this.props.hasExternalLogins && <CircleButton>Or</CircleButton> } */}
                     {/* { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink) */}
-                    { isValidate && (!isEmail || !isFullName || !isCity || !isProfileLink)
+                    { isValidate && (!isEmail || !isFullName || !isCity)
                         ? <Text>Please fill in required fields</Text>
                         : null
                     }
@@ -397,25 +417,23 @@ class SignUp extends Component {
                                 type="text"
                                 onChange={this.getValue}
                                 floatingLabelText="Social Link"
-                                floatingLabelStyle={ isValidate && !isProfileLink ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                                floatingLabelShrinkStyle={ isValidate && !isProfileLink ? styles.focusStyle.error : styles.focusStyle.success }
+                                floatingLabelStyle={ styles.floatingLabelStyle.success}
+                                floatingLabelShrinkStyle={ styles.focusStyle.success }
                                 underlineShow={false}
                                 />              
                         </MuiThemeProvider> 
                         { isProfileLink && <Img src={Images.check} alt="checked"></Img> }
-                        { isValidate && !isProfileLink && <Img src={Images.warnning} alt="warnning"></Img> }
+                        {/* { isValidate && !isProfileLink && <Img src={Images.warnning} alt="warnning"></Img> } */}
                         { !isProfileLink && !isValidate && <Img empty></Img> } 
                     </Form> 
-                    { !isProfileLink && isValidate
-                        ? <UnderLine error></UnderLine>
-                        : <UnderLine></UnderLine>
-                    }
+                     <UnderLine></UnderLine>
+                    
 
                     { isLoading
                         ? <SpinWrapper><ReactLoading type="spinningBubbles" color="#4cbf69" height='70' width='70' /></SpinWrapper>
                         :
                         <ButtonWrapper signup>
-                        { !isValidate || (isEmail && isFullName && isCity && isProfileLink )
+                        { !isValidate || (isEmail && isFullName && isCity )
                                 ? <SignUpButton active onClick={this.handleSignUp}>Sign Up</SignUpButton>
                                 : <SignUpButton onClick={this.handleSignUp}>Sign Up</SignUpButton>
                             }

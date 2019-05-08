@@ -52,17 +52,12 @@ export function getExternalLogins() {
     return function (dispatch) {
         return new Promise((resolve, reject) => {
             if (cookies.get('userInfo')!=='') {
-                console.log('User has registered');
                 let data = {
                     isLoggedIn:true,
                     hasRegistered:true,
                     fullName:cookies.get('name')
                 }
-                // const externalLogins = {
-                //     url:"/profile/talent/person"
-                // }
                 let hasExternalLogins=1
-                console.log(data);
                 dispatch({
                     type: Types.GOT_EXTERNAL_LOGINS,
                     data: { hasExternalLogins}
@@ -159,7 +154,6 @@ export function signInRequest(credentials){
             credentials.grant_type = 'password';
             return requestApi('Token', credentials, "POST")
                 .then(response => {
-                    
                     console.log('signInRequest.response: ', response)
                     dispatch({
                         type: Types.LOGIN_SUCCESS,
@@ -185,6 +179,7 @@ export function signUpRequest(userInfo){
             requestApi('UserRegistration', userInfo, "POST")
                 .then(
                     response => {
+                        console.log(response)
                         if(response.data[0].ret){
                             resolve(true);
                         }

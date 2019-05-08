@@ -74,22 +74,22 @@ class ForgotPassword extends Component {
         if (name === 'email') {
             this.setState({ isEmail: Validate.emailValidate(value)})
         }
-        if (name === 'token') {
-            this.setState({ isCode: Validate.codeValidate(value)})
-        }
-        if (name === 'newPassword') {
-            this.setState({ isPassword: Validate.passwordValidate(value)})
-        }
-        if (name === 'confirmPassword') {
-            this.setState({ isConfirmPassword: Validate.confirmPasswordValidate(value, this.state.newPassword)})
-        }
+        // if (name === 'token') {
+        //     this.setState({ isCode: Validate.codeValidate(value)})
+        // }
+        // if (name === 'newPassword') {
+        //     this.setState({ isPassword: Validate.passwordValidate(value)})
+        // }
+        // if (name === 'confirmPassword') {
+        //     this.setState({ isConfirmPassword: Validate.confirmPasswordValidate(value, this.state.newPassword)})
+        // }
         e.preventDefault()
     }
 
     handleSubmit = () => {
 
             const { isEmail } = this.state
-            this.setState({ isValidate: true })
+            this.setState({ isValidate: true,isError:false })
             if(!isEmail) {
                 return
             }
@@ -102,7 +102,7 @@ class ForgotPassword extends Component {
             bodyFormData.append('URL',window.location.origin+"/talent-change-password");
             axios({
                 method: 'post',
-                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SendEmail',
+                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/ForgotPassword',
                 data: bodyFormData,
                 config: { headers: {'Content-Type': 'multipart/form-data' }}
                 })
@@ -202,7 +202,7 @@ class ForgotPassword extends Component {
                 <Content>
                 <Heading>Forgot your password?</Heading>
                     { this.state.isCodeSent?
-                        <Heading>Verification code was sent to the email address.</Heading>:null
+                        <Text style={{ color:"green" }}>Verification code has been sent to the email address.</Text>:null
                     }
                     
                     { isValidate && !isEmail 

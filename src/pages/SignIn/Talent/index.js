@@ -192,7 +192,7 @@ class SignIn extends Component {
             })
             .then((response) => {
                 console.log(response.data.status)
-                if(response.data.status){
+                if(response.data.status==='1'){
                     let userInfo = {
                         log:'',
                         email:response.data.data[0].Email,
@@ -207,6 +207,7 @@ class SignIn extends Component {
                     })
                     cookies.set('userInfo',userInfo,{path:'/',expires:expires})
                     cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                    console.log(cookies.get('isLoggedIn'));
                     browserHistory.push('/profile/talent/person');
                 }else{
                     this.setState({
@@ -249,11 +250,45 @@ class SignIn extends Component {
         }
       };
       handleSuccessLog = (data) => {
-        // this.setState({
-        //   code: data.code,
-        //   errorMessage: '',
-        // });
-        console.log("LinkedIn Success ",data)
+        console.log(data.code)
+        var redirect = window.location.origin+"/linkedin";
+        // Second Step of Authentication
+            axios({
+                method: 'post',
+                url: `https://cors-anywhere.herokuapp.com/https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${data.code}&redirect_uri=${redirect}&client_id=8129i2daae37nq&client_secret=IdU7fiZp1Aii7AAG`,
+                config: { headers: {'Content-Type': ' application/x-www-form-urlencoded' }}
+                })
+                .then((response) => {
+                        cookies.set('acT',response.data.access_token,{path:'/',expires:expires})
+                }).catch((err) => {
+                    console.log(err)
+                    this.setState({
+                        errorMessage: 'Something went wrong',
+                        isLoading:false 
+                    })
+                     
+                });
+                console.log('cookies token'+cookies.get('acT'));
+                // Third step of Authentication
+
+                axios({
+                    method: 'GET',
+                    url: `https://cors-anywhere.herokuapp.com/https://www.linkedin.com/v2/me`,
+                     headers: {
+                        'Authorization': `Bearer ${cookies.get('acT')}`
+                         }
+                    })
+                    .then((response) => {
+                        console.log(response);
+                          
+                    }).catch((err) => {
+                        console.log(err)
+                        this.setState({
+                            errorMessage: 'Something went wrong',
+                            isLoading:false 
+                        })
+                         
+                    });
       }
     
       handleFailureLog = (error) => {
@@ -292,7 +327,7 @@ class SignIn extends Component {
                         buttonType={'button'}
                         getOAuthToken
                     /> */}
-                    {/* <LinkedInLog
+                    <LinkedInLog
                         clientId="8129i2daae37nq"
                         onFailure={this.handleFailureLog}
                         onSuccess={this.handleSuccessLog}
@@ -301,7 +336,7 @@ class SignIn extends Component {
                         LinkedinPopUp
                         >
                         LinkedIn
-                    </LinkedInLog> */}
+                    </LinkedInLog>
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}

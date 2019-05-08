@@ -54,9 +54,12 @@ export function fullnameValidate(name){
 }
 
 export function socialValidate(value){
-    let email = value.toLowerCase()   
-    if (email.indexOf('linkedin.com') !== -1 || email.indexOf('google.com') !== -1 || email.indexOf('behance.com') !== -1 || email.indexOf('facebook.com') !== -1 || email.indexOf('github.com') !== -1) {
+    let social = value.toLowerCase()   
+    if (social.indexOf('linkedin.com') !== -1 || social.indexOf('google.com') !== -1 || social.indexOf('behance.com') !== -1 || social.indexOf('facebook.com') !== -1 || social.indexOf('github.com') !== -1) {
         return true
+    }
+    if(social === ''){
+        return true;
     }
     return false
 }
