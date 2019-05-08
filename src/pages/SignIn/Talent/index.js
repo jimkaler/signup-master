@@ -352,7 +352,7 @@ class SignIn extends Component {
                         callback={responseFacebook} 
                     /> */}
                      <div className="sc-jbKcbu linKDN">
-                     <LinkedInLog
+                     {/* <LinkedInLog
                         clientId="8129i2daae37nq"
                         onFailure={this.handleFailureLog}
                         onSuccess={this.handleSuccessLog}
@@ -361,8 +361,8 @@ class SignIn extends Component {
                         LinkedinPopUp
                         >
                         Sign up With LinkedIn
-                    </LinkedInLog>
-                        {/* <LinkedIn
+                    </LinkedInLog> */}
+                        <LinkedIn
                             clientId="81rg1g83flx6m5"
                             callback={this.callbackLinkedIn}
                             text="Sign up With LinkedIn"
@@ -371,7 +371,7 @@ class SignIn extends Component {
                         >
                         <img src={Images.google} alt="google" />
                             <p>Sign up with Google</p>
-                        </LinkedIn> */}
+                        </LinkedIn>
                      </div>
                      
                     {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
