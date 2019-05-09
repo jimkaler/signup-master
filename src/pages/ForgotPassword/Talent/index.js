@@ -107,11 +107,17 @@ class ForgotPassword extends Component {
                 config: { headers: {'Content-Type': 'multipart/form-data' }}
                 })
                 .then((response) => {
-                    console.log(response)
+                    if(response.data.data[0].ret==='1'){
+                        this.setState({ 
+                            isLoading: false,
+                            isCodeSent:true
+                         })
+                    }else{
                     this.setState({ 
                         isLoading: false,
-                        isCodeSent:true
-                     })
+                        isError:true,
+                        });
+                    }
                 }).catch((err) => {
                     console.log(err)
                     this.setState({ 
@@ -133,69 +139,7 @@ class ForgotPassword extends Component {
 
     render() {
         const { isEmail, isCode, isPassword, isConfirmPassword, isValidate, isLoading } = this.state;
-        const newPasswordElement = (
-            <Wrapper>
-                <Form>
-                    <MuiThemeProvider>
-                        <TextField
-                            name="token"
-                            onChange={this.getValue}
-                            floatingLabelText="Verification code"
-                            floatingLabelStyle={ isValidate && !isCode ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                            floatingLabelShrinkStyle={ isValidate && !isCode ? styles.focusStyle.error : styles.focusStyle.success }
-                            underlineShow={false}
-                            />              
-                    </MuiThemeProvider> 
-                    { isCode && <Img src={Images.check} alt="checked"></Img> }
-                    { !isCode && isValidate && <Img src={Images.warnning} alt="warnning"></Img> }
-                    { !isCode && !isValidate && <Img empty></Img> } 
-                </Form>
-                { !isCode && isValidate
-                    ? <UnderLine error></UnderLine>
-                    : <UnderLine></UnderLine>
-                }
-                <Form>
-                    <MuiThemeProvider>
-                        <TextField
-                            name="newPassword"
-                            type="password"
-                            onChange={this.getValue}
-                            floatingLabelText="Password"
-                            floatingLabelStyle={ isValidate && !isPassword ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                            floatingLabelShrinkStyle={ isValidate && !isPassword ? styles.focusStyle.error : styles.focusStyle.success }
-                            underlineShow={false}
-                            />              
-                    </MuiThemeProvider> 
-                    { isPassword && <Img src={Images.check} alt="checked"></Img> }
-                    { isValidate && !isPassword && <Img src={Images.warnning} alt="warnning"></Img> }
-                    { !isPassword && !isValidate && <Img empty></Img> } 
-                </Form>
-                { !isPassword && isValidate
-                    ? <UnderLine error></UnderLine>
-                    : <UnderLine></UnderLine>
-                }
-                <Form>
-                    <MuiThemeProvider>
-                        <TextField
-                            name="confirmPassword"
-                            type="password"
-                            onChange={this.getValue}
-                            floatingLabelText="Confirm Password"
-                            floatingLabelStyle={ isValidate && !isConfirmPassword ? styles.floatingLabelStyle.error : styles.floatingLabelStyle.success}
-                            floatingLabelShrinkStyle={ isValidate && !isConfirmPassword ? styles.focusStyle.error : styles.focusStyle.success }
-                            underlineShow={false}
-                            />              
-                    </MuiThemeProvider> 
-                    { isConfirmPassword && <Img src={Images.check} alt="checked"></Img> }
-                    { isValidate && !isConfirmPassword && <Img src={Images.warnning} alt="warnning"></Img> }
-                    { !isConfirmPassword && !isValidate && <Img empty></Img> } 
-                </Form> 
-                { !isConfirmPassword && isValidate
-                    ? <UnderLine error></UnderLine>
-                    : <UnderLine></UnderLine>
-                }
-            </Wrapper>
-        );         
+  
         return (
             <Wrapper>                      
                 <Header/>                       
