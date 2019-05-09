@@ -107,12 +107,14 @@ class ForgotPassword extends Component {
                 config: { headers: {'Content-Type': 'multipart/form-data' }}
                 })
                 .then((response) => {
-                    if(response.data.data[0].ret==='1'){
+                    if(response.data.data[0].ret===1){
+                        console.log('success')
                         this.setState({ 
                             isLoading: false,
                             isCodeSent:true
                          })
                     }else{
+                        console.log('error')
                     this.setState({ 
                         isLoading: false,
                         isError:true,
