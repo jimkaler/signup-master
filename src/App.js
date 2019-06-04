@@ -7,8 +7,8 @@ import { bindActionCreators } from 'redux'
 // import { browserHistory } from 'react-router'
 import { reset } from './reducers'
 import { getUserInfo, registerExternalUser } from './actions/auth'
-import Cookies from 'universal-cookie';
-const cookies = new Cookies();
+// import Cookies from 'universal-cookie';
+// const cookies = new Cookies();
 class App extends Component {
     constructor(props){
         super(props);
@@ -18,8 +18,6 @@ class App extends Component {
     }
 
     componentWillMount() {
-        // cookies.remove('isLoggedIn', { path: '/' })
-        console.log("App Cokies "+cookies.get('isLoggedIn'))
         const hash = window.location.hash;
         const urlFragments = this.parseUrlFragments(hash);
         window.location.hash = '';

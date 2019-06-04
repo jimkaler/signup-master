@@ -106,22 +106,23 @@ class Candidate extends Component {
     componentWillMount() {
         console.log('Candidate:componentWillMount');
         if (!this.props.isLoggedIn) {
-            browserHistory.push('/signin/talent');
+            // browserHistory.push('/signin/talent');
         }
         if (this.props.profileId && !this.props.isCompleted) {
-            browserHistory.push('/profile/talent/person');
+            // browserHistory.push('/profile/talent/person');
         }
         autoScrolling();
     }
 
     componentDidMount() {
-        console.log('Candidate:componentDidMount');
+        // console.log('Candidate:componentDidMount');
+        this.setState({loading:false})
         if (this.props.isLoggedIn) {
             const headers = { Authorization: this.props.header };
             this.props.actions.getUserProfile(headers)
             .then((data) => {
                 if (!this.props.isCompleted) {
-                    browserHistory.push('/profile/talent/person');
+                    // browserHistory.push('/profile/talent/person');
                 }
                 profile = data;
                 this.setState({
@@ -143,11 +144,11 @@ class Candidate extends Component {
             })
             .catch((error) => {
                 if (error.status === 404) {
-                    browserHistory.push('/profile/talent/person');
+                    // browserHistory.push('/profile/talent/person');
                     return;
                 }
                 this.props.actions.reset();
-                browserHistory.push('/signin/talent');
+                // browserHistory.push('/signin/talent');
             });
         }
     }
@@ -405,7 +406,7 @@ const mapStateToProps = (state) => {
     } = state.talent;
     return {
         user: state.auth,
-        isEditable: state.auth.isEditable,  
+        isEditable: state.auth.isEditable,
         isLoggedIn: state.auth.isLoggedIn,
         header: state.auth.header,
         profileId,

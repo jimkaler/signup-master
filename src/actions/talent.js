@@ -56,6 +56,28 @@ export function getUserProfile(headers) {
     }
 }
 
+export function PostSignUp1(data,type){
+    console.log(data)
+    return function (dispatch) {
+    dispatch({
+        type: type,
+        data: { fullName: data.FirstName + ' ' + data.LastName, location: data.Location }
+    })
+    }
+    // return {
+    //     payload: {fullName: data.FirstName + ' ' + data.LastName, location:data.Location},
+    //     type: type
+    //   }
+}
+
+export function storeUserProfile(data,type){
+    return function(dispatch){
+        dispatch({
+            type:type,
+            data:data
+        })
+    }
+}
 export function postSignup1Data(step, data, headers){
     return function (dispatch) {
         return new Promise((resolve, reject) => {

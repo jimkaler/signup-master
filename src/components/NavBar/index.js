@@ -31,9 +31,7 @@ class Navigation extends Component {
             switched: false,            
         }      
     }
-    componentWillMount(){
-        console.log(cookies.get('isLoggedIn'))
-    }
+    
     scrollingOnMobile = () => {        
         if(this.state.isActive){
             enableScrolling('mobile')

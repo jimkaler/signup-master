@@ -21,9 +21,13 @@ import {
     NextButton } from './PersonStyle'
 import Images from '../../../themes/images'
 import { postSignup1Data } from '../../../actions/talent'
+import { PostSignUp1 } from '../../../actions/talent'
 import { reset } from '../../../reducers'
 import * as Validate from '../../../constants/validate'
-
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+const expires = new Date()
+expires.setDate(expires.getDate() + 14)
 const styles = {
     floatingLabelStyle: {
         error : {
@@ -59,11 +63,17 @@ class Person extends Component {
     }
 
     componentDidMount () {
+        let userInfo = cookies.get('userInfo');
         console.log('Profile:Talent:Person:componentDidMount:props:', this.props);
-        this.setState({ fullName: this.props.fullName });
-        this.setState({ isFullName: Validate.fullnameValidate(this.props.fullName) })
-        this.setState({ location: this.props.location });
-        this.setState({ isLocation: Validate.placeValidate(this.props.location) })
+        this.setState({ fullName: userInfo.name });
+        this.setState({ location: userInfo.location });
+        this.setState({ isFullName: Validate.fullnameValidate(userInfo.name) })
+        this.setState({ isLocation: Validate.placeValidate(userInfo.location) })
+        // this.setState({ fullName: this.props.fullName });
+        // this.setState({ location: this.props.location });
+        // this.setState({ isFullName: Validate.fullnameValidate(this.props.fullName) })
+        // this.setState({ isLocation: Validate.placeValidate(this.props.location) })
+        console.log(cookies.get('userInfo'))
     }
 
     getValue = (e) => {
@@ -90,15 +100,25 @@ class Person extends Component {
             LastName: this.state.fullName.split(' ')[1],
             Location: this.state.location
         }
+        let initialForm ={
+            firstName:this.state.fullName.split(' ')[0],
+            lastName: this.state.fullName.split(' ')[1],
+            location: this.state.location
+        }
+        // const ACTION_FIRST ="ACTION_FIRST";
+        // this.props.actions.PostSignUp1(obj,ACTION_FIRST)
+        cookies.set('initialForm',initialForm,{path:'/',expires:expires})
         const headers = { Authorization: this.props.header };
-        this.props.actions.postSignup1Data('Profile/Signup1', obj, headers)
-            .then(() => {
-                this.setState({ isLoading: false });
-                browserHistory.push('/profile/talent/category');
-            })
-            .catch(() => {
-                this.setState({ isLoading: false })
-            })               
+        browserHistory.push('/profile/talent/category');
+        /*  Code for Save data in API */
+        // this.props.actions.postSignup1Data('Profile/Signup1', obj, headers)
+        //     .then(() => {
+        //         this.setState({ isLoading: false });
+        //         browserHistory.push('/profile/talent/category');
+        //     })
+        //     .catch(() => {
+        //         this.setState({ isLoading: false })
+        //     })               
     }
 
     render() {
@@ -177,7 +197,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         actions: bindActionCreators({
-            postSignup1Data, reset
+            postSignup1Data, reset,PostSignUp1
         }, dispatch)
     }
 }

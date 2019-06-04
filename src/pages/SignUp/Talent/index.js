@@ -24,12 +24,14 @@ import {
     SignUpButton } from './Style'
 import Images from '../../../themes/images'
 import * as urls from '../../../constants/urls'
+import * as config from '../../../constants/config'
 import { signUpRequest, signInRequest, getExternalLogins, startExternalLogin } from '../../../actions/auth'
 import { reset } from '../../../reducers'
 import * as Validate from '../../../constants/validate'
 import { GoogleLogin } from 'react-google-login';
 import Cookies from 'universal-cookie';
 import axios from 'axios';
+import $ from 'jquery'; 
 const expires = new Date()
 expires.setDate(expires.getDate() + 14)
 const styles = {
@@ -56,7 +58,6 @@ const styles = {
 }
 const cookies = new Cookies();
 const responseGoogle = (response) => {
-    console.log(response);
     if(response.error){
         console.log(response.error)
     }else{
@@ -69,7 +70,8 @@ const responseGoogle = (response) => {
             lastName:response.profileObj.familyName,
             image:response.profileObj.imageUrl,
             name:response.profileObj.name,
-            id:response.Zi.access_token
+            id:response.Zi.access_token,
+            location:''
         }
         userInfo = JSON.stringify(userInfo);
         userInfo = JSON.parse(userInfo);
@@ -79,30 +81,112 @@ const responseGoogle = (response) => {
         bodyFormData.append('Name',response.profileObj.name);
         bodyFormData.append('Email',response.profileObj.email);
         bodyFormData.append('Token',response.Zi.access_token);
-        axios({
-            method: 'post',
-            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SocialMediaLogin',
-            data: bodyFormData,
-            config: { headers: {'Content-Type': 'multipart/form-data' }}
-            })
-            .then((response) => {
-                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
-                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
-                    browserHistory.push('/profile/talent/person');
-            }).catch((err) => {
-                console.log(err)
-                // this.setState({ 
-                //     isLoading: false,
-                //     isError:true,
-                //     isSuccess:false
-                //  });
-                 
-            });
 
+        let InveniasData = {
+                "EmailAddresses": [
+                  {
+                     "FieldName": "Email1Address",
+                     "DisplayTitle": "Email",
+                     "ItemValue": response.profileObj.email
+                  }
+                ],
+                "NameComponents": {
+                  "FullName": response.profileObj.name,
+                  "FamilyName": response.profileObj.familyName,
+                  "FirstName": response.profileObj.givenName,
+                  "Suffix": response.profileObj.familyName,
+                }
+              }
+    
+                axios({
+                    method: 'post',
+                    url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SocialMediaLogin',
+                    data: bodyFormData,
+                    config: { headers: {'Content-Type': 'multipart/form-data' }}
+                    })
+                    .then((response) => {
+                        console.log(response)
+                            var userInfo = cookies.get('userInfo')
+                            userInfo.id = response.data.data[0].Id;
+                            cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                            if(response.data.data[0].InveniasId==null || response.data.data[0].InveniasId==''){
+                                /* Get Access Token */
+                                var settings = {
+                                    "async": true,
+                                    "crossDomain": true,
+                                    "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+                                    "method": "POST",
+                                    "headers": {
+                                    "cache-control": "no-cache",
+                                    },
+                                    "data": {
+                                    "username": "bjorn@adveniopeople.com",
+                                    "password": "Cyclops2+",
+                                    "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+                                    "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+                                    "grant_type": "password",
+                                    "scope": "openid profile api email"
+                                    }
+                                }
+                                $.ajax(settings).done(function (response) {
+                                sessionStorage.setItem('AccessToken',response.access_token); 
+                                SaveDataIntoInvenias()
+                                })
+                                .fail(function (jqXHR, textStatus) {
+                                    console.log(textStatus);
+                                });
+                                /* Get Access Token */
+                                
+                        }else{
+                            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                            browserHistory.push('/profile/talent/person');
+                        }    
+                }).catch((err) => {
+                    console.log(err)
+                });
+                var Udata = cookies.get('userInfo');
+                function SaveDataIntoInvenias(){
+                    axios({
+                        method: 'post',
+                        url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
+                        data: InveniasData,
+                        async:true,
+                        headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken') }
+                        })
+                        .then((response) => {
+                            console.log(response)
+                            UpdateDataToDB(response.data.Id)
+                        }).catch((err) => {
+                            console.log(err)
+                        });
+                    }
+
+                    function UpdateDataToDB(InveniasId){
+                        var userData = cookies.get('userInfo');
+                        var newFormData = new FormData();
+                        newFormData.append('UserId',userData.id);
+                        newFormData.append('InveniasId',InveniasId);
+                            axios({
+                            method: 'post',
+                            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
+                            data: newFormData,
+                            config: { headers: {'Content-Type': 'multipart/form-data' }}
+                            })
+                            .then((response) => {
+                                    var userInfo = cookies.get('userInfo');
+                                    userInfo.invenias_id = InveniasId;
+                                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                                    browserHistory.push('/profile/talent/person');
+                            }).catch((err) => {
+                                console.log(err)
+                            });
+
+                    }
         
     }
 
-        console.log(cookies.get('userInfo').loggedIn);
+        console.log(cookies.get('userInfo'));
   }
 //   const responseFacebook = (response) => {
 //     console.log(response);
@@ -120,6 +204,7 @@ class SignUp extends Component {
             isEmail: false,
             isPassword: false,
             isConfirmPassword: false,
+            profileLink:'',
             isCity:false,
             isFullName:false,
             isProfileLink:false,
@@ -145,7 +230,7 @@ class SignUp extends Component {
              browserHistory.push('/profile/talent/person');
         }
 
-        cookies.set('authType', 'talent', { path: '/' },expires,expires);
+        cookies.set('authType', 'talent', { path: '/' ,expires:expires});
     }
 
     componentDidMount() {
@@ -176,6 +261,8 @@ class SignUp extends Component {
 
         e.preventDefault()
     }
+
+   
 
     handleSignUp = () => {                       
         const { isEmail, isFullName,isCity } = this.state
@@ -208,36 +295,204 @@ class SignUp extends Component {
         bodyFormData.append('city',this.state.city);
         bodyFormData.append('socialLink',this.state.profileLink);
         bodyFormData.append('passwordUrl',window.location.origin+"/talent-change-password");
-        axios({
-            method: 'post',
-            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserRegistration',
-            data: bodyFormData,
-            config: { headers: {'Content-Type': 'multipart/form-data' }}
-            })
-            .then((response) => {
-                console.log(response.data.data[0])
-                if(response.data.data[0].ret==='1'){
-                    this.setState({ 
-                        isLoading: false,
-                        isError:false,
-                        isSuccess:true
+        var name = this.state.fullName;
+        name = name.split(' ');
+        var fname = name[0];
+        var lname = name[1];
+                    /* Get Access Token */
+                    var settings = {
+                        "async": true,
+                        "crossDomain": true,
+                        "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+                        "method": "POST",
+                        "headers": {
+                          "cache-control": "no-cache",
+                        },
+                        "data": {
+                          "username": "bjorn@adveniopeople.com",
+                          "password": "Cyclops2+",
+                          "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+                          "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+                          "grant_type": "password",
+                          "scope": "openid profile api email"
+                        }
+                      }
+
+                      $.ajax({
+                        async: true,
+                        crossDomain: true,
+                        url: "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+                        method: "POST",
+                        headers: {
+                            "cache-control": "no-cache",
+                        },
+                        data: {
+                            "username": "bjorn@adveniopeople.com",
+                            "password": "Cyclops2+",
+                            "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+                            "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+                            "grant_type": "password",
+                            "scope": "openid profile api email"
+                        },success:function (response) {
+                            sessionStorage.setItem('AccessToken',response.access_token); 
+                            // SaveDataIntoInvenias()
+
+                            axios({
+                                method: 'post',
+                                url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
+                                data: InveniasData,
+                                async:true,
+                                headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken')  }
+                                })
+                                .then((response) => {
+                                    // SaveDataIntoDb(response.data.Id)
+                                    var invId = response.data.Id;
+
+                                    axios({
+                                        method: 'post',
+                                        url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserRegistration',
+                                        data: bodyFormData,
+                                        async:true,
+                                        config: { headers: {'Content-Type': 'multipart/form-data' }}
+                                        })
+                                        .then((response) => {
+                                            console.log(response.data.data[0])
+                                            if(response.data.data[0].ret===1){
+                                                // UpdateDataToDB(response.data.data[0].UserId,InveniasId);
+                                                var userData = cookies.get('userInfo');
+                                                var newFormData = new FormData();
+                                                newFormData.append('UserId',response.data.data[0].UserId);
+                                                newFormData.append('InveniasId',invId);
+                                                    axios({
+                                                    method: 'post',
+                                                    url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
+                                                    data: newFormData,
+                                                    config: { headers: {'Content-Type': 'multipart/form-data' }}
+                                                    })
+                                                    .then((response) => {
+                                                        this.setState({ 
+                                                            isLoading: false,
+                                                            isError:false,
+                                                            isSuccess:true
+                                                        });
+                                                    }).catch((err) => {
+                                                        console.log(err)
+                                                    });
+
+                                                
+                                            }else{
+                                                this.setState({ 
+                                                    isLoading: false,
+                                                    errorMessage:response.data.data[0].message,
+                                                    isSuccess:false
+                                                });
+                                            }
+                                        }).catch((err) => {
+                                            this.setState({ 
+                                                isLoading: false,
+                                                isError:true,
+                                                isSuccess:false
+                                            });
+                                            
+                                        });
+
+                                }).catch((err) => {
+                                    console.log(err)
+                                });
+
+                          }.bind(this),error: function(err){
+                              console.log(err)
+                          }.bind(this)
+                      })
+                      .fail(function (jqXHR, textStatus) {
+                        console.log(textStatus);
                     });
-                }else{
-                    this.setState({ 
-                        isLoading: false,
-                        errorMessage:response.data.data[0].message,
-                        isSuccess:false
-                    });
-                }
-            }).catch((err) => {
-                console.log(err)
-                this.setState({ 
-                    isLoading: false,
-                    isError:true,
-                    isSuccess:false
-                 });
-                 
-            });
+                    /* Get Access Token */
+            
+                    var InveniasData = {
+                        "EmailAddresses": [
+                            {
+                               "FieldName": "Email1Address",
+                               "DisplayTitle": "Email",
+                               "ItemValue": this.state.email
+                            }
+                          ],
+                          "NameComponents": {
+                            "FullName": this.state.fullName,
+                            "FamilyName": lname,
+                            "FirstName": fname,
+                            "Suffix": lname,
+                          }
+                    }
+
+                    function SaveDataIntoInvenias(){
+                        // axios({
+                        //     method: 'post',
+                        //     url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
+                        //     data: InveniasData,
+                        //     async:true,
+                        //     headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken')  }
+                        //     })
+                        //     .then((response) => {
+                        //         SaveDataIntoDb(response.data.Id)
+                        //     }).catch((err) => {
+                        //         console.log(err)
+                        //     });
+                    }
+
+                function SaveDataIntoDb(InveniasId){
+                // axios({
+                //     method: 'post',
+                //     url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserRegistration',
+                //     data: bodyFormData,
+                //     async:true,
+                //     config: { headers: {'Content-Type': 'multipart/form-data' }}
+                //     })
+                //     .then((response) => {
+                //         console.log(response.data.data[0])
+                //         if(response.data.data[0].ret==='1'){
+                //             UpdateDataToDB(response.data.data[0].UserId,InveniasId);
+                            
+                //         }else{
+                //             this.setState({ 
+                //                 isLoading: false,
+                //                 errorMessage:response.data.data[0].message,
+                //                 isSuccess:false
+                //             });
+                //         }
+                //     }).catch((err) => {
+                //         this.setState({ 
+                //             isLoading: false,
+                //             isError:true,
+                //             isSuccess:false
+                //         });
+                        
+                //     });
+                    }
+
+                    function UpdateDataToDB(userId,InveniasId){
+                        // var userData = cookies.get('userInfo');
+                        // var newFormData = new FormData();
+                        // newFormData.append('UserId',userId);
+                        // newFormData.append('InveniasId',InveniasId);
+                        //     axios({
+                        //     method: 'post',
+                        //     url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
+                        //     data: newFormData,
+                        //     config: { headers: {'Content-Type': 'multipart/form-data' }}
+                        //     })
+                        //     .then((response) => {
+                        //         this.setState({ 
+                        //             isLoading: false,
+                        //             isError:false,
+                        //             isSuccess:true
+                        //         });
+                        //     }).catch((err) => {
+                        //         console.log(err)
+                        //     });
+            
+                           
+                  }
 
     }
 
@@ -288,11 +543,6 @@ class SignUp extends Component {
 
                     }).catch((err) => {
                         console.log(err)
-                        // this.setState({
-                        //     errorMessage: 'Something went wrong',
-                        //     isLoading:false 
-                        // })
-                         
                     });
                 }
                // 4 Get Email address
@@ -316,17 +566,13 @@ class SignUp extends Component {
                         image:'',
                         id:cookies.get('LinkID'),
                         name:cookies.get('LinkFN')+" "+cookies.get('LinkLN'),
+                        location:''
                     }
                     cookies.set('userInfo',userInfo,{path:'/',expires:expires})
-                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                   
                     registerUser(email)
                 }).catch((err) => {
                     console.log(err)
-                    // this.setState({
-                    //     errorMessage: 'Something went wrong',
-                    //     isLoading:false 
-                    // })
-                     
                 });   
             }
             function registerUser(email){
@@ -342,25 +588,105 @@ class SignUp extends Component {
                     config: { headers: {'Content-Type': 'multipart/form-data' }}
                     })
                     .then((response) => {
-                        browserHistory.push('/profile/talent/person');
+                        var uData = cookies.get('userInfo');
+                        uData.id = response.data.data[0].Id;
+                        if(response.data.data[0].Id=='' || response.data.data[0].Id==null){
+                            cookies.set('userInfo',uData,{path:'/',expires:expires});
+                            SaveDataIntoInvenias();
+                        }else{
+                            cookies.set('userInfo',uData,{path:'/',expires:expires});
+                            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                            browserHistory.push('/profile/talent/person');
+                        }
                     }).catch((err) => {
                         console.log(err)
-                        // this.setState({ 
-                        //     isLoading: false,
-                        //     isError:true,
-                        //     isSuccess:false
-                        // });
-                        
                     });
             }
+            /* Get Access Token */
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+            "method": "POST",
+            "headers": {
+              "cache-control": "no-cache",
+            },
+            "data": {
+              "username": "bjorn@adveniopeople.com",
+              "password": "Cyclops2+",
+              "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+              "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+              "grant_type": "password",
+              "scope": "openid profile api email"
+            }
+          }
+          $.ajax(settings).done(function (response) {
+           sessionStorage.setItem('AccessToken',response.access_token); 
+           SaveDataIntoInvenias()
+          })
+          .fail(function (jqXHR, textStatus) {
+            console.log(textStatus);
+        });
+        /* Get Access Token */
+
+        var uData = cookies.get('userInfo');
+        var InveniasData = {
+            "EmailAddresses": [
+                {
+                   "FieldName": "Email1Address",
+                   "DisplayTitle": "Email",
+                   "ItemValue": uData.email
+                }
+              ],
+              "NameComponents": {
+                "FullName": uData.firstName+" "+uData.lastName,
+                "FamilyName": uData.lastName,
+                "FirstName": uData.firstName,
+                "Suffix": uData.lastName,
+              }
+        }
+        function SaveDataIntoInvenias(){
+            axios({
+                method: 'post',
+                url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
+                data: InveniasData,
+                async:true,
+                headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken')  }
+                })
+                .then((response) => {
+                    UpdateDataToDB(response.data.Id)
+                }).catch((err) => {
+                    console.log(err)
+                });
+        }
+ 
+        function UpdateDataToDB(InveniasId){
+            var userData = cookies.get('userInfo');
+            var newFormData = new FormData();
+            newFormData.append('UserId',userData.id);
+            newFormData.append('InveniasId',InveniasId);
+                axios({
+                method: 'post',
+                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
+                data: newFormData,
+                config: { headers: {'Content-Type': 'multipart/form-data' }}
+                })
+                .then((response) => {
+                        var userInfo = cookies.get('userInfo');
+                        userInfo.invenias_id = InveniasId;
+                        cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                        cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                        browserHistory.push('/profile/talent/person');
+                }).catch((err) => {
+                    console.log(err)
+                });
+
+ 
+        }
                
       }
     
       handleFailureLog = (error) => {
-        // this.setState({
-        //   code: '',
-        //   errorMessage: error.errorMessage,
-        // });
         console.log("LinkedIn Error ",error)
       }
     render() {

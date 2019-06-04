@@ -108,20 +108,17 @@ class ForgotPassword extends Component {
                 })
                 .then((response) => {
                     if(response.data.data[0].ret===1){
-                        console.log('success')
                         this.setState({ 
                             isLoading: false,
                             isCodeSent:true
                          })
                     }else{
-                        console.log('error')
                     this.setState({ 
                         isLoading: false,
                         isError:true,
                         });
                     }
                 }).catch((err) => {
-                    console.log(err)
                     this.setState({ 
                         isLoading: false,
                         isError:true,
@@ -140,7 +137,7 @@ class ForgotPassword extends Component {
     }
 
     render() {
-        const { isEmail, isCode, isPassword, isConfirmPassword, isValidate, isLoading } = this.state;
+        const { isEmail, isPassword, isConfirmPassword, isValidate, isLoading } = this.state;
   
         return (
             <Wrapper>                      

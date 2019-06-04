@@ -17,7 +17,26 @@ const initialState = {
 
 const talent_reducer = (state = initialState, action) => {
     switch(action.type){
+        case Types.STORE_USER_PROFILE:
+            return Object.assign({}, state, {
+                profileId: action.data.id,
+                fullName: action.data.fullName,
+                email: action.data.email,
+                // phone: action.data.phone,
+                // skype: action.data.skype,
+                // proPicURL: action.data.proPicURL,
+                location: action.data.location,
+                roles: action.data.roles,
+                techs: action.data.technologies,
+                subRoles: action.data.subRoles,
+                locations: action.data.locations,
+                beverage: action.data.beverage,
+                social: action.data.socialMedia,
+                // status: action.data.jobSeekingStatus,
+                isCompleted: action.data.locations.length > 0
+            });
         case Types.GET_USER_PROFILE_SUCCESS:
+            console.log("I am calling")
             return Object.assign({}, state, {
                 profileId: action.data.id,
                 fullName: action.data.fullName,

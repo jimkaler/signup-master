@@ -9,7 +9,6 @@ import * as urls from '../../../constants/urls'
 import { getExternalLogins, signInRequest, startExternalLogin } from '../../../actions/auth'
 import { reset } from '../../../reducers'
 import { GoogleLogin } from 'react-google-login';
-import Cookies from 'universal-cookie';
 import {LinkedIn as LinkedInLog } from 'react-linkedin-login-oauth2';
 import Header from '../../../components/Header'
 import { 
@@ -33,9 +32,9 @@ import {
 import Images from '../../../themes/images'
 import * as Validate from '../../../constants/validate'
 import axios from 'axios';
+import Cookies from 'universal-cookie';
+import $ from 'jquery'; 
 const cookies = new Cookies();
-
-
 
 const styles = {
     floatingLabelStyle: {
@@ -68,6 +67,7 @@ const responseGoogle = (response) => {
     }else{
         const expires = new Date()
         expires.setDate(expires.getDate() + 14)
+        // console.log(response)
         let userInfo = {
             log:response.Zi.access_token,
             email:response.profileObj.email,
@@ -75,7 +75,8 @@ const responseGoogle = (response) => {
             lastName:response.profileObj.familyName,
             image:response.profileObj.imageUrl,
             name:response.profileObj.name,
-            id:response.Zi.access_token
+            id:response.Zi.access_token,
+            location:''
         }
         userInfo = JSON.stringify(userInfo);
         userInfo = JSON.parse(userInfo);
@@ -84,6 +85,22 @@ const responseGoogle = (response) => {
         bodyFormData.append('Name',response.profileObj.name);
         bodyFormData.append('Email',response.profileObj.email);
         bodyFormData.append('Token',response.Zi.access_token);
+        let InveniasData = {
+            "EmailAddresses": [
+              {
+                 "FieldName": "Email1Address",
+                 "DisplayTitle": "Email",
+                 "ItemValue": response.profileObj.email
+              }
+            ],
+            "NameComponents": {
+              "FullName": response.profileObj.name,
+              "FamilyName": response.profileObj.familyName,
+              "FirstName": response.profileObj.givenName,
+              "Suffix": response.profileObj.familyName,
+            }
+          }
+          cookies.set('userInfo',userInfo,{path:'/',expires:expires})
         axios({
             method: 'post',
             url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/SocialMediaLogin',
@@ -91,18 +108,89 @@ const responseGoogle = (response) => {
             config: { headers: {'Content-Type': 'multipart/form-data' }}
             })
             .then((response) => {
-                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                var userInfo = cookies.get('userInfo')
+                userInfo.id = response.data.data[0].Id;
+                cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                if(response.data.data[0].InveniasId==null || response.data.data[0].InveniasId==''){
+                    /* Get Access Token */
+                    var settings = {
+                        "async": true,
+                        "crossDomain": true,
+                        "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+                        "method": "POST",
+                        "headers": {
+                        "cache-control": "no-cache",
+                        },
+                        "data": {
+                        "username": "bjorn@adveniopeople.com",
+                        "password": "Cyclops2+",
+                        "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+                        "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+                        "grant_type": "password",
+                        "scope": "openid profile api email"
+                        }
+                    }
+                    $.ajax(settings).done(function (response) {
+                    sessionStorage.setItem('AccessToken',response.access_token); 
+                    SaveDataIntoInvenias()
+                    })
+                    .fail(function (jqXHR, textStatus) {
+                        console.log(textStatus);
+                    });
+                    /* Get Access Token */
+                }else{
                     cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                     browserHistory.push('/profile/talent/person');
+                }    
             }).catch((err) => {
                 console.log(err)
                 
             });
 
+            var Udata = cookies.get('userInfo');
+                function SaveDataIntoInvenias(){
+                    axios({
+                        method: 'post',
+                        url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
+                        data: InveniasData,
+                        async:true,
+                        headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken') }
+                        })
+                        .then((response) => {
+                            console.log(response)
+                            UpdateDataToDB(response.data.Id)
+                        }).catch((err) => {
+                            console.log(err)
+                        });
+                    }
+
+                    function UpdateDataToDB(InveniasId){
+                        var userData = cookies.get('userInfo');
+                        var newFormData = new FormData();
+                        newFormData.append('UserId',userData.id);
+                        newFormData.append('InveniasId',InveniasId);
+                            axios({
+                            method: 'post',
+                            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
+                            data: newFormData,
+                            config: { headers: {'Content-Type': 'multipart/form-data' }}
+                            })
+                            .then((response) => {
+                                    var userInfo = cookies.get('userInfo');
+                                    userInfo.invenias_id = InveniasId;
+                                    cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                                    cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                                    browserHistory.push('/profile/talent/person');
+                            }).catch((err) => {
+                                console.log(err)
+                            });
+
+                    }
+
 
     }
 
-        console.log("Running Function "+cookies.get('isLoggedIn'));
+        // console.log("Running Function "+cookies.get('isLoggedIn'));
   }
 
 class SignIn extends Component {
@@ -116,20 +204,18 @@ class SignIn extends Component {
             errorMessage: null
         }
     }
-    responseLinkedin = (response) => {
-        console.log(response)
-      }
+
     componentWillMount() {
         
         if(!cookies.get('isLoggedIn')){
             cookies.set('isLoggedIn',false,{path:'/'})
         }
         if(cookies.get('isLoggedIn')==='false'){
-            console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
+            // console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
               
            
         }else{
-            console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
+            // console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
              browserHistory.push('/profile/talent/person');
         }
 
@@ -179,17 +265,22 @@ class SignIn extends Component {
             config: { headers: {'Content-Type': 'multipart/form-data' }}
             })
             .then((response) => {
-                console.log(response.data.status)
                 if(response.data.status==='1'){
+                    console.log(response)
+                    let name = response.data.data[0].Name.split(' ');
+                    let fname = name[0];
+                    let lname = name[1]; 
                     let userInfo = {
                         log:'',
                         email:response.data.data[0].Email,
-                        firstName:'',
-                        lastName:'',
+                        firstName:fname,
+                        lastName:lname,
                         image:'',
                         id:response.data.data[0].Id,
-                        name:'',
+                        name:response.data.data[0].Name,
+                        location:response.data.data[0].Location
                     }
+                    console.log(userInfo);
                     this.setState({
                         isLoading:false 
                     })
@@ -230,12 +321,13 @@ class SignIn extends Component {
             axios({
                 method: 'post',
                 url: `https://cors-anywhere.herokuapp.com/https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${data.code}&redirect_uri=${redirect}&client_id=8129i2daae37nq&client_secret=IdU7fiZp1Aii7AAG`,
+                async:true
                 })
                 .then((response) => {
-                        cookies.set('acT',response.data.access_token,{path:'/',expires:expires})
-                        getLiteProfile(response.data.access_token);
+                    cookies.set('acT',response.data.access_token,{path:'/',expires:expires})
+                    getLiteProfile(response.data.access_token);
                 }).catch((err) => {
-                    console.log(err)
+                    // console.log(err)
                     this.setState({
                         errorMessage: 'Something went wrong',
                         isLoading:false 
@@ -248,9 +340,11 @@ class SignIn extends Component {
                     axios({
                     method: 'GET',
                     url: `https://cors-anywhere.herokuapp.com/https://api.linkedin.com/v2/me?projection=(firstName,lastName)
-                    &oauth2_access_token=${token}`
+                    &oauth2_access_token=${token}`,
+                    async:true
                     })
                     .then((response) => {
+                        // console.log(response)
                         let localeCountry = response.data.firstName.preferredLocale.country;
                         let localeLang = response.data.firstName.preferredLocale.language;
                         let locale = localeLang+"_"+localeCountry;
@@ -264,11 +358,6 @@ class SignIn extends Component {
 
                     }).catch((err) => {
                         console.log(err)
-                        // this.setState({
-                        //     errorMessage: 'Something went wrong',
-                        //     isLoading:false 
-                        // })
-                         
                     });
                 }
                // 4 Get Email address
@@ -292,6 +381,7 @@ class SignIn extends Component {
                         image:'',
                         id:cookies.get('LinkID'),
                         name:cookies.get('LinkFN')+" "+cookies.get('LinkLN'),
+                        location:''
                     }
                     cookies.set('userInfo',userInfo,{path:'/',expires:expires})
                     cookies.set('isLoggedIn',true,{path:'/',expires:expires})
@@ -318,19 +408,103 @@ class SignIn extends Component {
                     config: { headers: {'Content-Type': 'multipart/form-data' }}
                     })
                     .then((response) => {
-                        browserHistory.push('/profile/talent/person');
+                        var uData = cookies.get('userInfo');
+                        uData.id = response.data.data[0].Id;
+                        if(response.data.data[0].Id=='' || response.data.data[0].Id==null){
+                            cookies.set('userInfo',uData,{path:'/',expires:expires});
+                            SaveDataIntoInvenias();
+                        }else{
+                            cookies.set('userInfo',uData,{path:'/',expires:expires});
+                            cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                            browserHistory.push('/profile/talent/person');
+                        }
                     }).catch((err) => {
                         console.log(err)
-                        // this.setState({ 
-                        //     isLoading: false,
-                        //     isError:true,
-                        //     isSuccess:false
-                        // });
-                        
                     });
             }
+
+             /* Get Access Token */
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+            "method": "POST",
+            "headers": {
+              "cache-control": "no-cache",
+            },
+            "data": {
+              "username": "bjorn@adveniopeople.com",
+              "password": "Cyclops2+",
+              "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+              "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+              "grant_type": "password",
+              "scope": "openid profile api email"
+            }
+          }
+          $.ajax(settings).done(function (response) {
+           sessionStorage.setItem('AccessToken',response.access_token); 
+           SaveDataIntoInvenias()
+          })
+          .fail(function (jqXHR, textStatus) {
+            console.log(textStatus);
+        });
+        /* Get Access Token */
+
+        var uData = cookies.get('userInfo');
+        var InveniasData = {
+            "EmailAddresses": [
+                {
+                   "FieldName": "Email1Address",
+                   "DisplayTitle": "Email",
+                   "ItemValue": uData.email
+                }
+              ],
+              "NameComponents": {
+                "FullName": uData.firstName+" "+uData.lastName,
+                "FamilyName": uData.lastName,
+                "FirstName": uData.firstName,
+                "Suffix": uData.lastName,
+              }
+        }
+        function SaveDataIntoInvenias(){
+            axios({
+                method: 'post',
+                url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
+                data: InveniasData,
+                async:true,
+                headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken')  }
+                })
+                .then((response) => {
+                    UpdateDataToDB(response.data.Id)
+                }).catch((err) => {
+                    console.log(err)
+                });
+        }
+ 
+        function UpdateDataToDB(InveniasId){
+            var userData = cookies.get('userInfo');
+            var newFormData = new FormData();
+            newFormData.append('UserId',userData.id);
+            newFormData.append('InveniasId',InveniasId);
+                axios({
+                method: 'post',
+                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
+                data: newFormData,
+                config: { headers: {'Content-Type': 'multipart/form-data' }}
+                })
+                .then((response) => {
+                        var userInfo = cookies.get('userInfo');
+                        userInfo.invenias_id = InveniasId;
+                        cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                        cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+                        browserHistory.push('/profile/talent/person');
+                }).catch((err) => {
+                    console.log(err)
+                });
+
                
       }
+    }
     
       handleFailureLog = (error) => {
         // this.setState({

@@ -15,9 +15,9 @@ export const request = (path, data, method, headers) => {
 }
 
 export const requestApi = (path, data, method, headers) => {
-    const url = urls.API_HOST + `/${path}`
-    // let HOSTS = 'http://localhost:3001/invenias';
-    // const url = HOSTS + `/${path}`;
+    // const url = urls.API_HOST + `/${path}`
+    let HOSTS = 'http://localhost:3003/invenias';
+    const url = HOSTS + `/${path}`;
     let query = {        
           url: url,
           method: method,

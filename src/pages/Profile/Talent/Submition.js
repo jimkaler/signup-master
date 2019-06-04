@@ -34,11 +34,16 @@ import {
     IconWrapper,
     SocialImg,
     ToggleWrapper } from './Style'
-import { getSubmitionData, postSubmitionData } from '../../../actions/talent'
+import { getSubmitionData, postSubmitionData,storeUserProfile } from '../../../actions/talent'
 import * as Validate from '../../../constants/validate'
 import { cities } from '../../../constants/data'
 import { autoScrolling } from '../../../jquery';
-
+import * as urls from '../../../constants/urls'
+import Cookies from 'universal-cookie';
+import axios from 'axios';
+const cookies = new Cookies();
+const expires = new Date()
+expires.setDate(expires.getDate() + 14)
 const styles = {
     floatingLabelStyle: {
       color: '#565252'
@@ -67,14 +72,20 @@ class Submition extends Component {
             git: false,
             isHighlight: false,
             switched: false,
-            enableAdd: false      
+            enableAdd: false,
+            firstName:'',
+            lastName:'',
+            socialLink:'',
+
         }
     }
     
     componentWillMount() {
-
+        console.log(this.props)
+        if(!cookies.get('isLoggedIn')){
+            browserHistory.push('/signin/talent');
+        }
         autoScrolling()
-
         let socialType        
         if(this.props.social){
             this.props.social.map(url => {
@@ -92,7 +103,8 @@ class Submition extends Component {
         }        
     }
 
-    addTag = (text) => {        
+    addTag = (text) => {      
+        text = text.replace(/[\W_]+/g," "); 
         let temp = this.state.locations.slice()
         temp.push(text)
         this.setState({ locations: temp })        
@@ -154,7 +166,10 @@ class Submition extends Component {
     }
 
     getPlace = (e) => {
-        e.target.value.length > 1 ? this.setState({ enableAdd: true, place: e.target.value }) : this.setState({ enableAdd: false, place: e.target.value })        
+        var format = /[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+        e.target.value.length > 1 ? this.setState({ enableAdd: true, place: e.target.value }) : this.setState({ enableAdd: false, place: e.target.value })
+        format.test(e.target.value) ? this.setState({ enableAdd: false, place: e.target.value }) : this.setState({ enableAdd: true, place: e.target.value })
+        // e.target.value.indexOf(',') === -1 ? this.setState({ enableAdd: true, place: e.target.value }) : this.setState({ enableAdd: false, place: e.target.value })
     }
 
     addLocation = () => {
@@ -216,18 +231,122 @@ class Submition extends Component {
             Social: this.state.urls,
             Status: this.state.status
         }
-        this.setState({ isLoading: true })        
-        const headers = { Authorization: this.props.header };
-        !this.props.isCompleted ? this.props.actions.postSubmitionData('Profile/Signup3', obj, headers)
-            .then(() => {      
-                this.props.actions.getSubmitionData(obj)          
-                setTimeout(() => {
-                    browserHistory.push(path)
-                },2000)   
-            }).catch(() => {
-                this.setState({ isLoading: false });
-                this.showAlert();
-            }) : browserHistory.push(path)
+        
+        if(this.state.locations.length<1 || this.state.locations<1 || this.state.beverage==='' || this.state.urls<1 || this.state.status===''){
+            this.showAlert();
+        }else{
+            let stateValue= '';
+            switch(this.state.status){
+                case 0:
+                stateValue = "Active" 
+                break;
+                case 1:
+                stateValue = "Pasive"
+                break;
+                case 2: 
+                stateValue = "It's complicated"
+                break;
+                case 3:
+                stateValue = "Undecided"  
+            }
+            var firstForm = cookies.get('firstForm');
+            var userInfo = cookies.get('userInfo');
+            var initialForm = cookies.get('initialForm');
+
+            const dataValue = { 
+                FirstName: initialForm.firstName,
+                LastName: initialForm.lastName,
+                Location: initialForm.location,
+                Email: userInfo.email,
+                ProfileId: userInfo.id,
+                Roles:firstForm.Roles,
+                SubRoles:firstForm.SubRoles,
+                Technologies:firstForm.Technologies,           
+                PrefLocations: this.state.locations,
+                Beverage: this.state.beverage,
+                Social: this.state.urls,
+                Status: stateValue
+            }
+            console.log(dataValue)
+            cookies.set('completeData',dataValue,{path:'/'})
+
+             /* API request start*/
+             let bodyFormData = new FormData();
+                bodyFormData.append('UserId',userInfo.id);
+                bodyFormData.append('UserName',initialForm.firstName+' '+initialForm.lastName);
+                bodyFormData.append('Beverage',this.state.beverage);
+                bodyFormData.append('Location',initialForm.location);
+                bodyFormData.append('PreferredLocations',this.state.locations);
+                bodyFormData.append('Roles',firstForm.Roles);
+                bodyFormData.append('SocialLinks',this.state.urls);            
+                bodyFormData.append('SubRoles',firstForm.SubRoles);
+                bodyFormData.append('Technologies',firstForm.Technologies);
+                bodyFormData.append('Skypename','');
+                bodyFormData.append('Phone','');
+                axios({
+                    method: 'post',
+                    url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserUpdateProfile',
+                    data: bodyFormData,
+                    async:true,
+                    config: { headers: {'Content-Type': 'multipart/form-data' }}
+                    })
+                    .then((response) => {
+                        let data = {
+                            id:userInfo.id,
+                            fullName:initialForm.firstName+' '+initialForm.lastName,
+                            email:userInfo.email,
+                            location:initialForm.location,
+                            locations:this.state.locations,
+                            roles:firstForm.Roles,
+                            technologies:firstForm.Technologies,
+                            subRoles:firstForm.SubRoles,
+                            beverage:this.state.beverage,
+                            socialMedia:this.state.urls,
+                            jobSeekingStatus:"active",
+                        }
+                        this.props.actions.storeUserProfile(data,"STORE_USER_PROFILE")
+                        if(response.data.data[0].ret==true){
+                            // browserHistory.push('/profile/talent/candidate');
+                        }
+                    }).catch((err) => {
+                        console.log(err)                       
+                    });
+             /* API Request End */    
+
+
+            /* Invenias request start*/
+            // let bodyFormData = new FormData();
+            // axios({
+            //     method: 'post',
+            //     url: 'https://cors-anywhere.herokuapp.com/'+urls.INVENIAS_HOST+'/api/v1/people',
+            //     data: bodyFormData,
+            //     async:true,
+            //     config: { headers: {'Content-Type': 'multipart/form-data' }}
+            //     })
+            //     .then((response) => {
+            //             userInfo.id = response.data.data[0].Id;
+            //             cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+            //             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
+            //             browserHistory.push('/profile/talent/person');
+            //     }).catch((err) => {
+            //         console.log(err)
+                                        
+            //     });
+            /* Invenias Request End */    
+        }
+        // this.setState({ isLoading: true })        
+        // const headers = { Authorization: this.props.header };
+        // browserHistory.push('/profile/talent/candidate');
+        // !this.props.isCompleted ? this.props.actions.postSubmitionData('Profile/Signup3', obj, headers)
+        //     .then(() => {      
+        //         this.props.actions.getSubmitionData(obj)          
+        //         setTimeout(() => {
+        //             browserHistory.push(path)
+        //         },2000)   
+        //     }).catch(() => {
+        //         this.setState({ isLoading: false });
+        //         this.showAlert();
+        //     }) : browserHistory.push(path)
     }
 
     alertOptions = {
@@ -239,6 +358,7 @@ class Submition extends Component {
     }
      
     showAlert = () => {
+        // browserHistory.push('/profile/talent/candidate');
         this.msg.info('Please fill out all fields.', {
             time: 0,
             type: 'info',
@@ -380,7 +500,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         actions: bindActionCreators({
             getSubmitionData,
-            postSubmitionData
+            postSubmitionData,
+            storeUserProfile
         }, dispatch)
     }
 }

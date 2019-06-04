@@ -52,15 +52,15 @@ export function getExternalLogins() {
     return function (dispatch) {
         return new Promise((resolve, reject) => {
             if (cookies.get('userInfo')!=='') {
-                let data = {
-                    isLoggedIn:true,
-                    hasRegistered:true,
-                    fullName:cookies.get('name')
-                }
-                let hasExternalLogins=1
+                // let data = {
+                //     isLoggedIn:true,
+                //     hasRegistered:true,
+                //     fullName:cookies.get('name')
+                // }
+                let hasExternalLogins=true
                 dispatch({
                     type: Types.GOT_EXTERNAL_LOGINS,
-                    data: { hasExternalLogins}
+                    data: { hasExternalLogins:true,isLoggedIn:true}
                 });
             } else {
                 console.log('User hasn\'t registered');
