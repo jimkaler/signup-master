@@ -436,6 +436,9 @@ class SignUp extends Component {
     handleSuccessLog = (data) => {
         // console.log(data.code)
         var redirect = window.location.origin+"/linkedin";
+        this.setState({
+            isLoading:true
+        })
         // 2 Get Access Token
             axios({
                 method: 'post',
@@ -474,6 +477,9 @@ class SignUp extends Component {
 
                     }).catch((err) => {
                         console.log(err)
+                        this.setState({
+                            isLoading:false
+                        });
                     });
                 }
                // 4 Get Email address
@@ -504,6 +510,9 @@ class SignUp extends Component {
                     registerUser(email)
                 }).catch((err) => {
                     console.log(err)
+                    this.setState({
+                            isLoading:false
+                    });
                 });   
             }
             function registerUser(email){
@@ -531,6 +540,9 @@ class SignUp extends Component {
                         }
                     }).catch((err) => {
                         console.log(err)
+                        this.setState({
+                            isLoading:false
+                        });
                     });
             }
             /* Get Access Token */
@@ -558,6 +570,9 @@ class SignUp extends Component {
           })
           .fail(function (jqXHR, textStatus) {
             console.log(textStatus);
+            this.setState({
+                isLoading:false
+            });
         });
     }
         /* Get Access Token */
@@ -594,6 +609,9 @@ class SignUp extends Component {
                     UpdateDataToDB(response.data.Id)
                 }).catch((err) => {
                     console.log(err)
+                    this.setState({
+                        isLoading:false
+                    });
                 });
         }
  
@@ -616,6 +634,9 @@ class SignUp extends Component {
                         browserHistory.push('/profile/talent/person');
                 }).catch((err) => {
                     console.log(err)
+                    this.setState({
+                        isLoading:false
+                    });
                 });
 
  
@@ -625,6 +646,9 @@ class SignUp extends Component {
     
       handleFailureLog = (error) => {
         console.log("LinkedIn Error ",error)
+        this.setState({
+            isLoading:false
+        });
       }
     render() {
         const { isEmail, isFullName, isCity,isProfileLink, isValidate, isLoading, errorMessage } = this.state

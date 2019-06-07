@@ -317,6 +317,9 @@ class SignIn extends Component {
       handleSuccessLog = (data) => {
         // console.log(data.code)
         var redirect = window.location.origin+"/linkedin";
+        this.setState({
+            isLoading:true
+        })
         // 2 Get Access Token
             axios({
                 method: 'post',
@@ -411,14 +414,17 @@ class SignIn extends Component {
                         var uData = cookies.get('userInfo');
                         uData.id = response.data.data[0].Id;
                         if(response.data.data[0].InveniasId==='' || response.data.data[0].InveniasId===null){
-                            cookies.set('userInfo',uData,{path:'/',expires:expires});
+                            cookies.set('userInfo',uData,{path  :'/',expires:expires});
                             getToken();
-                        }else{
+                        }else{  
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                             browserHistory.push('/profile/talent/person');
                         }
                     }).catch((err) => {
+                        this.setState({
+                            isLoading:false
+                        })
                         console.log(err)
                     });
             }
@@ -448,6 +454,9 @@ class SignIn extends Component {
           })
           .fail(function (jqXHR, textStatus) {
             console.log(textStatus);
+            this.setState({
+                isLoading:false
+            })
         });
     }
         /* Get Access Token */
@@ -481,6 +490,9 @@ class SignIn extends Component {
                     UpdateDataToDB(response.data.Id)
                 }).catch((err) => {
                     console.log(err)
+                    this.setState({
+                        isLoading:false
+                    })
                 });
         }
  
@@ -503,6 +515,9 @@ class SignIn extends Component {
                         browserHistory.push('/profile/talent/person');
                 }).catch((err) => {
                     console.log(err)
+                    this.setState({
+                        isLoading:false
+                    })
                 });
 
                
