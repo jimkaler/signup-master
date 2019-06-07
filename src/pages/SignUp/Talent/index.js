@@ -425,75 +425,6 @@ class SignUp extends Component {
                           }
                     }
 
-                    function SaveDataIntoInvenias(){
-                        // axios({
-                        //     method: 'post',
-                        //     url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
-                        //     data: InveniasData,
-                        //     async:true,
-                        //     headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken')  }
-                        //     })
-                        //     .then((response) => {
-                        //         SaveDataIntoDb(response.data.Id)
-                        //     }).catch((err) => {
-                        //         console.log(err)
-                        //     });
-                    }
-
-                function SaveDataIntoDb(InveniasId){
-                // axios({
-                //     method: 'post',
-                //     url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserRegistration',
-                //     data: bodyFormData,
-                //     async:true,
-                //     config: { headers: {'Content-Type': 'multipart/form-data' }}
-                //     })
-                //     .then((response) => {
-                //         console.log(response.data.data[0])
-                //         if(response.data.data[0].ret==='1'){
-                //             UpdateDataToDB(response.data.data[0].UserId,InveniasId);
-                            
-                //         }else{
-                //             this.setState({ 
-                //                 isLoading: false,
-                //                 errorMessage:response.data.data[0].message,
-                //                 isSuccess:false
-                //             });
-                //         }
-                //     }).catch((err) => {
-                //         this.setState({ 
-                //             isLoading: false,
-                //             isError:true,
-                //             isSuccess:false
-                //         });
-                        
-                //     });
-                    }
-
-                    function UpdateDataToDB(userId,InveniasId){
-                        // var userData = cookies.get('userInfo');
-                        // var newFormData = new FormData();
-                        // newFormData.append('UserId',userId);
-                        // newFormData.append('InveniasId',InveniasId);
-                        //     axios({
-                        //     method: 'post',
-                        //     url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
-                        //     data: newFormData,
-                        //     config: { headers: {'Content-Type': 'multipart/form-data' }}
-                        //     })
-                        //     .then((response) => {
-                        //         this.setState({ 
-                        //             isLoading: false,
-                        //             isError:false,
-                        //             isSuccess:true
-                        //         });
-                        //     }).catch((err) => {
-                        //         console.log(err)
-                        //     });
-            
-                           
-                  }
-
     }
 
     handleSocialLogin = (social) => {
@@ -592,7 +523,7 @@ class SignUp extends Component {
                         uData.id = response.data.data[0].Id;
                         if(response.data.data[0].Id=='' || response.data.data[0].Id==null){
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
-                            SaveDataIntoInvenias();
+                            getToken();
                         }else{
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
@@ -603,6 +534,7 @@ class SignUp extends Component {
                     });
             }
             /* Get Access Token */
+        function getToken(){    
         var settings = {
             "async": true,
             "crossDomain": true,
@@ -627,25 +559,30 @@ class SignUp extends Component {
           .fail(function (jqXHR, textStatus) {
             console.log(textStatus);
         });
+    }
         /* Get Access Token */
 
-        var uData = cookies.get('userInfo');
-        var InveniasData = {
-            "EmailAddresses": [
-                {
-                   "FieldName": "Email1Address",
-                   "DisplayTitle": "Email",
-                   "ItemValue": uData.email
-                }
-              ],
-              "NameComponents": {
-                "FullName": uData.firstName+" "+uData.lastName,
-                "FamilyName": uData.lastName,
-                "FirstName": uData.firstName,
-                "Suffix": uData.lastName,
-              }
-        }
+       
         function SaveDataIntoInvenias(){
+            var uData = cookies.get('userInfo');
+            var InveniasData = {
+                "EmailAddresses": [
+                    {
+                       "FieldName": "Email1Address",
+                       "DisplayTitle": "Email",
+                       "ItemValue": uData.email
+                    }
+                  ],
+                  "NameComponents": {
+                    "FullName": uData.firstName+" "+uData.lastName,
+                    "FamilyName": uData.lastName,
+                    "FirstName": uData.firstName,
+                    "Suffix": uData.lastName,
+                  },
+                  "HomeAddress": {
+                    "TownCity": "Jalandhar",
+                  }
+            }
             axios({
                 method: 'post',
                 url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
@@ -714,13 +651,6 @@ class SignUp extends Component {
                             icon={'false'}
                         />
                     </div>
-                    {/* <FacebookLogin
-                        appId="353197588660922"
-                        autoLoad={true}
-                        fields="name,email,picture"
-                        // onClick={componentClicked}
-                        callback={responseFacebook} 
-                    /> */}
                     <div className="sc-jbKcbu linKDN">
                      <LinkedInLog
                         clientId={urls.LINKEDIN_KEY}
@@ -733,15 +663,6 @@ class SignUp extends Component {
                         Sign up With LinkedIn
                     </LinkedInLog>
                      </div>
-                     
-                    {/* <SocialButtons
-                    provider='google'
-                    appId='674955079351-aj6d9o466o2hhcvsh78it0695egdcmvh.apps.googleusercontent.com'
-                    onLoginSuccess={this.handleSocialLogins}
-                    onLoginFailure={this.handleSocialLoginFailures}
-                    >
-                    Login with Google
-                    </SocialButtons> */}
                     
                     {/* { this.props.hasExternalLogins && this.props.externalLogins['google'] && */}
                         <SocialButton style={{ display:"none" }} google onClick={() =>this.handleSocialLogin('google')}>

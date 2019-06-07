@@ -410,9 +410,9 @@ class SignIn extends Component {
                     .then((response) => {
                         var uData = cookies.get('userInfo');
                         uData.id = response.data.data[0].Id;
-                        if(response.data.data[0].Id=='' || response.data.data[0].Id==null){
+                        if(response.data.data[0].InveniasId==='' || response.data.data[0].InveniasId===null){
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
-                            SaveDataIntoInvenias();
+                            getToken();
                         }else{
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
@@ -424,6 +424,7 @@ class SignIn extends Component {
             }
 
              /* Get Access Token */
+       function getToken(){
         var settings = {
             "async": true,
             "crossDomain": true,
@@ -448,25 +449,27 @@ class SignIn extends Component {
           .fail(function (jqXHR, textStatus) {
             console.log(textStatus);
         });
+    }
         /* Get Access Token */
 
-        var uData = cookies.get('userInfo');
-        var InveniasData = {
-            "EmailAddresses": [
-                {
-                   "FieldName": "Email1Address",
-                   "DisplayTitle": "Email",
-                   "ItemValue": uData.email
-                }
-              ],
-              "NameComponents": {
-                "FullName": uData.firstName+" "+uData.lastName,
-                "FamilyName": uData.lastName,
-                "FirstName": uData.firstName,
-                "Suffix": uData.lastName,
-              }
-        }
+
         function SaveDataIntoInvenias(){
+            var uData = cookies.get('userInfo');
+            var InveniasData = {
+                "EmailAddresses": [
+                    {
+                       "FieldName": "Email1Address",
+                       "DisplayTitle": "Email",
+                       "ItemValue": uData.email
+                    }
+                  ],
+                  "NameComponents": {
+                    "FullName": uData.firstName+" "+uData.lastName,
+                    "FamilyName": uData.lastName,
+                    "FirstName": uData.firstName,
+                    "Suffix": uData.lastName,
+                  }
+            }
             axios({
                 method: 'post',
                 url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people',
@@ -522,26 +525,6 @@ class SignIn extends Component {
                     <Heading>Sign in now</Heading>
                    
                     <ButtonWrapper>
-                    {/* <LinkedinSDK
-                        clientId="81rg1g83flx6m5"
-                        callBack={this.responseLinkedin}
-                        fields=":(id,num-connections,picture-urls::(original))"
-                        className={'className'}
-                        loginButtonText={'Login with Linkedin'}
-                        logoutButtonText={'Logout from Linkedin'}
-                        buttonType={'button'}                        
-                        getOAuthToken
-                    /> */}
-                    {/* <LinkedinSDK
-                        clientId="81rg1g83flx6m5"
-                        callBack={responseLinkedin}
-                        fields=":(id,num-connections,picture-urls::(original))"
-                        className={'className'}
-                        loginButtonText={'Login with Linkedin'}
-                        logoutButtonText={'Logout from Linkedin'}
-                        buttonType={'button'}
-                        getOAuthToken
-                    /> */}
                     <div className="sc-jbKcbu gnyyqT">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}
@@ -560,13 +543,6 @@ class SignIn extends Component {
                             icon={'false'}
                         />
                     </div>
-                    {/* <FacebookLogin
-                        appId="353197588660922"
-                        autoLoad={true}
-                        fields="name,email,picture"
-                        // onClick={componentClicked}
-                        callback={responseFacebook} 
-                    /> */}
                      <div className="sc-jbKcbu linKDN">
                      <LinkedInLog
                         clientId={urls.LINKEDIN_KEY}
@@ -576,7 +552,7 @@ class SignIn extends Component {
                         scope="r_liteprofile r_emailaddress"
                         LinkedinPopUp
                         >
-                        Sign up With LinkedIn
+                        Sign up with LinkedIn
                     </LinkedInLog>
                      </div>
                      
@@ -586,11 +562,6 @@ class SignIn extends Component {
                             <p>Sign in with Google</p>
                         </SocialButton> 
                         {/* } */}
-                    {/* { this.props.hasExternalLogins && this.props.externalLogins['facebook'] &&
-                        <SocialButton onClick={() =>this.handleSocialLogin('facebook')}>
-                            <img src={Images.facebook1} alt="facebook" />
-                            <p>Sign in with Facebook</p>
-                        </SocialButton> } */}
                     </ButtonWrapper>
                     { this.props.hasExternalLogins && 
                     <CircleButton>Or</CircleButton> 
