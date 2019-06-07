@@ -155,7 +155,6 @@ class Category extends Component {
                     : subRoles.push(key.replace(/_/g, " "))
             }
         });
-        console.log(subRoles)
         subRoles.forEach((subRole) => {            
             if(this.state.engineering.indexOf(subRole) !== -1){
                 if(roles.indexOf("Engineering") === -1){
@@ -196,7 +195,7 @@ class Category extends Component {
         }
         // this.setState({ isLoading: true })
         
-        if(roles.length<1 || subRoles.length<1 || obj.Technologies.length<1){
+        if(roles.length<1 || subRoles.length<1){
             this.showAlert();
         }else{
             cookies.set('firstForm',obj,{path:'/',expires:expires});

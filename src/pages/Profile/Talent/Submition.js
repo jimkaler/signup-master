@@ -71,7 +71,7 @@ class Submition extends Component {
             behance: false,
             git: false,
             isHighlight: false,
-            switched: false,
+            switched: true,
             enableAdd: false,
             firstName:'',
             lastName:'',
@@ -81,7 +81,6 @@ class Submition extends Component {
     }
     
     componentWillMount() {
-        console.log(this.props)
         if(!cookies.get('isLoggedIn')){
             browserHistory.push('/signin/talent');
         }
@@ -232,7 +231,7 @@ class Submition extends Component {
             Status: this.state.status
         }
         
-        if(this.state.locations.length<1 || this.state.locations<1 || this.state.beverage==='' || this.state.urls<1 || this.state.status===''){
+        if(this.state.locations.length<1 || this.state.locations<1 || this.state.beverage==='' || this.state.status===''){
             this.showAlert();
         }else{
             let stateValue= '';
@@ -267,7 +266,6 @@ class Submition extends Component {
                 Social: this.state.urls,
                 Status: stateValue
             }
-            console.log(dataValue)
             cookies.set('completeData',dataValue,{path:'/'})
 
              /* API request start*/
@@ -306,7 +304,7 @@ class Submition extends Component {
                         }
                         this.props.actions.storeUserProfile(data,"STORE_USER_PROFILE")
                         if(response.data.data[0].ret==true){
-                            // browserHistory.push('/profile/talent/candidate');
+                            browserHistory.push('/profile/talent/candidate');
                         }
                     }).catch((err) => {
                         console.log(err)                       
