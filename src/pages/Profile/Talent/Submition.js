@@ -377,16 +377,19 @@ class Submition extends Component {
                   ],
                  "CustomReferenceFields": [
                   {
+                     "Id": "8bdbeea3-fa8b-416b-94ea-b6ce2f420ec7",
                      "FieldName": "PersonCustom1",
                      "DisplayTitle": "Area of expertise",
                      "ItemValue": firstForm.Roles.toString()
                   },
                   {
+                    "Id": "17b4599a-7aa6-4291-9459-6022abb6ba0f",
                     "FieldName": "PersonCustom2",
                      "DisplayTitle": "Preferred Title",
                      "ItemValue": firstForm.SubRoles.toString()
                   },
                   {
+                    "Id": "3f0111df-0d90-4a4d-92ae-080ade774e6a",
                     "FieldName": "PersonCustom3",
                      "DisplayTitle": "Preferred technology or Expertise",
                      "ItemValue": firstForm.Technologies.toString()
