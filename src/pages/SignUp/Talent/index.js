@@ -25,6 +25,7 @@ import {
 import Images from '../../../themes/images'
 import * as urls from '../../../constants/urls'
 import * as config from '../../../constants/config'
+import { storeUserProfile } from '../../../actions/talent';
 import { signUpRequest, signInRequest, getExternalLogins, startExternalLogin } from '../../../actions/auth'
 import { reset } from '../../../reducers'
 import * as Validate from '../../../constants/validate'
@@ -57,7 +58,92 @@ const styles = {
     }
 }
 const cookies = new Cookies();
-const responseGoogle = (response) => {
+//   const responseFacebook = (response) => {
+//     console.log(response);
+//   }
+
+  const successStyle ={
+    color: 'green',
+    fontSize: '23px'
+  }
+  
+class SignUp extends Component {
+    constructor(props){
+        super(props)  
+        this.state = {
+            isEmail: false,
+            isPassword: false,
+            isConfirmPassword: false,
+            profileLink:'',
+            isCity:false,
+            isFullName:false,
+            isProfileLink:false,
+            isValidate: false,
+            isLoading: false,
+            errorMessage: null,
+            isSuccess:false,
+            state:false
+        }
+    }
+
+
+    componentWillMount() {
+
+        if(!cookies.get('isLoggedIn')){
+            cookies.set('isLoggedIn',false,{path:'/'})
+        }
+        if(cookies.get('isLoggedIn')==='false'){
+            console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
+              
+           
+        }else{
+            console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
+             browserHistory.push('/profile/talent/person');
+        }
+
+        cookies.set('authType', 'talent', { path: '/' ,expires:expires});
+    }
+
+    componentDidMount() {
+        if (!this.props.hasExternalLogins) {
+            // Request external login providers
+            this.props.actions.getExternalLogins();
+            // this.props.dispatch(getExternalLogins());
+        }
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+            "method": "POST",
+            "headers": {
+              "cache-control": "no-cache",
+            },
+            "data": {
+              "username": "bjorn@adveniopeople.com",
+              "password": "Cyclops2+",
+              "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+              "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+              "grant_type": "password",
+              "scope": "openid profile api email"
+            }
+          }
+          $.ajax(settings).done(function (response) {
+           sessionStorage.setItem('AccessToken',response.access_token); 
+
+          })
+          .fail(function (jqXHR, textStatus) {
+            this.setState({
+                isLoading:false
+            });
+        });
+    }
+
+
+
+    /* Google Login start */
+
+responseGoogle = (response) => {
+    const propsData = this.props;
     if(response.error){
         console.log(response.error)
     }else{
@@ -105,7 +191,6 @@ const responseGoogle = (response) => {
                     config: { headers: {'Content-Type': 'multipart/form-data' }}
                     })
                     .then((response) => {
-                        console.log(response)
                             var userInfo = cookies.get('userInfo')
                             userInfo.id = response.data.data[0].Id;
                             cookies.set('userInfo',userInfo,{path:'/',expires:expires})
@@ -138,6 +223,7 @@ const responseGoogle = (response) => {
                                 /* Get Access Token */
                                 
                         }else{
+                            // getUserInfo(response.data.data[0].Id)
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                             browserHistory.push('/profile/talent/person');
                         }    
@@ -154,7 +240,6 @@ const responseGoogle = (response) => {
                         headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken') }
                         })
                         .then((response) => {
-                            console.log(response)
                             UpdateDataToDB(response.data.Id)
                         }).catch((err) => {
                             console.log(err)
@@ -183,64 +268,66 @@ const responseGoogle = (response) => {
                             });
 
                     }
+                    // function getUserInfo(id){
+                       
+                    //     axios({
+                    //         method: 'get',
+                    //         url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/GetUserDetailById?UserId='+id,
+                    //         })
+                    //         .then((response) => {
+                    //             // console.log(response.data.data[0])
+                    //             var roles=[];
+                    //             var social=[];
+                    //             var subRoles=[];
+                    //             var locations=[];
+                    //             var techs = [];
+                    //             if(response.data.data[0].PreferredLocations!=""){
+                    //                 locations = response.data.data[0].PreferredLocations.split(',');
+                    //             }
+                    //             if(response.data.data[0].Roles!=""){
+                    //                 roles = response.data.data[0].Roles.split(',');
+                    //             }
+                    //             if(response.data.data[0].SocialLinks!=""){
+                    //                 social = response.data.data[0].SocialLinks.split(',');
+                    //             }
+                    //             if(response.data.data[0].SubRoles!=""){
+                    //                 subRoles = response.data.data[0].SubRoles.split(',');
+                    //             }
+                    //             if(response.data.data[0].Technologies!=""){
+                    //                 techs = response.data.data[0].Technologies.split(',');
+                    //             }
+                    //             var data = {
+                    //                 fullName:response.data.data[0].Name,
+                    //                 isLoggedIn:"true",
+                    //                 locations:locations,
+                    //                 phone:"",
+                    //                 proPicURL:undefined,
+                    //                 roles:roles,
+                    //                 skype:"",
+                    //                 social:social,
+                    //                 status:response.data.data[0].ProfileStatus,
+                    //                 subRoles:subRoles,
+                    //                 techs:techs,
+                    //                 isCompleted:true,
+                    //                 isEditable:false,
+                    //                 isLoggedIn:true,
+                    //                 InveniasId:response.data.data[0].ProfileStatus
+                    //             }
+                    //             propsData.actions.storeUserProfile(data,"STORE_USER_PROFILE")
+                    //             browserHistory.push('/profile/talent/person');
+                    //         }).catch((err) => {
+                    //             console.log(err)
+                    //         });
+                        
+                    // }
         
     }
 
-        console.log(cookies.get('userInfo'));
   }
-//   const responseFacebook = (response) => {
-//     console.log(response);
-//   }
 
-  const successStyle ={
-    color: 'green',
-    fontSize: '23px'
-  }
-  
-class SignUp extends Component {
-    constructor(props){
-        super(props)  
-        this.state = {
-            isEmail: false,
-            isPassword: false,
-            isConfirmPassword: false,
-            profileLink:'',
-            isCity:false,
-            isFullName:false,
-            isProfileLink:false,
-            isValidate: false,
-            isLoading: false,
-            errorMessage: null,
-            isSuccess:false,
-            state:false
-        }
-    }
+/* Google Login end */
 
-    componentWillMount() {
 
-        if(!cookies.get('isLoggedIn')){
-            cookies.set('isLoggedIn',false,{path:'/'})
-        }
-        if(cookies.get('isLoggedIn')==='false'){
-            console.log("LoggedIn Not Define? "+cookies.get('isLoggedIn'))
-              
-           
-        }else{
-            console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
-             browserHistory.push('/profile/talent/person');
-        }
-
-        cookies.set('authType', 'talent', { path: '/' ,expires:expires});
-    }
-
-    componentDidMount() {
-        if (!this.props.hasExternalLogins) {
-            // Request external login providers
-            this.props.actions.getExternalLogins();
-            // this.props.dispatch(getExternalLogins());
-        }
-        console.log('SignUp:componentDidMount');
-    }
 
     getValue = (e) => {
 
@@ -569,7 +656,6 @@ class SignUp extends Component {
            SaveDataIntoInvenias()
           })
           .fail(function (jqXHR, textStatus) {
-            console.log(textStatus);
             this.setState({
                 isLoading:false
             });
@@ -661,7 +747,7 @@ class SignUp extends Component {
                     <div className="sc-jbKcbu hQpXBD">
                         <GoogleLogin
                             clientId={urls.GOOGLE_KEY}
-                            onSuccess={responseGoogle}
+                            onSuccess={this.responseGoogle}
                             render={renderProps => (
                                 <div onClick={renderProps.onClick} disabled={renderProps.disabled} style={{ display:"inline-flex" }}>
                                     <img src="/assets/svgs/google-icon.svg" alt="google"/>
@@ -669,7 +755,7 @@ class SignUp extends Component {
                                 </div>
                                 
                               )}
-                            onFailure={responseGoogle}
+                            onFailure={this.responseGoogle}
                             cookiePolicy={'single_host_origin'}
                             // isSignedIn={'true'}
                             icon={'false'}
@@ -823,6 +909,7 @@ const mapDispatchToProps = (dispatch) => {
             signInRequest,
             getExternalLogins,
             startExternalLogin,
+            storeUserProfile,
             reset
         }, dispatch)
     }

@@ -34,7 +34,10 @@ import {
     Contact } from './Style'
 import Images from '../../../../themes/images'
 import { autoScrolling } from '../../../../jquery';
-
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+const expires = new Date()
+expires.setDate(expires.getDate() + 14)
 class TagList extends Component {
     constructor(props){
         super(props)        
@@ -77,7 +80,6 @@ const styles = {
         display: 'none'
     }
 }
-
 let profile = {};
 
 class Candidate extends Component {
@@ -115,7 +117,8 @@ class Candidate extends Component {
     }
 
     componentDidMount() {
-        // console.log('Candidate:componentDidMount');
+        console.log(this.props)
+        console.log(cookies.get('userInfo'))
         this.setState({loading:false})
         if (this.props.isLoggedIn) {
             const headers = { Authorization: this.props.header };

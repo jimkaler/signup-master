@@ -56,6 +56,7 @@ export function getUserProfile(headers) {
     }
 }
 
+
 export function PostSignUp1(data,type){
     console.log(data)
     return function (dispatch) {
@@ -64,10 +65,6 @@ export function PostSignUp1(data,type){
         data: { fullName: data.FirstName + ' ' + data.LastName, location: data.Location }
     })
     }
-    // return {
-    //     payload: {fullName: data.FirstName + ' ' + data.LastName, location:data.Location},
-    //     type: type
-    //   }
 }
 
 export function storeUserProfile(data,type){

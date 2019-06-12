@@ -38,7 +38,8 @@ import { getSubmitionData, postSubmitionData,storeUserProfile } from '../../../a
 import * as Validate from '../../../constants/validate'
 import { cities } from '../../../constants/data'
 import { autoScrolling } from '../../../jquery';
-import * as urls from '../../../constants/urls'
+import * as urls from '../../../constants/urls';
+import $ from 'jquery'; 
 import Cookies from 'universal-cookie';
 import axios from 'axios';
 const cookies = new Cookies();
@@ -101,7 +102,19 @@ class Submition extends Component {
                 
         }        
     }
-
+    componentDidMount(){
+        var userInfo = cookies.get('userInfo');
+        axios({
+            method: 'get',
+            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/GetUserDetailById?UserId='+userInfo.id,
+            })
+            .then((response) => {
+                cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
+            console.log(response.data.data[0].InveniasId)
+            }).catch((err) => {
+                console.log(err)
+            });
+    }
     addTag = (text) => {      
         text = text.replace(/[\W_]+/g," "); 
         let temp = this.state.locations.slice()
@@ -230,11 +243,10 @@ class Submition extends Component {
             Social: this.state.urls,
             Status: this.state.status
         }
-        
         if(this.state.locations.length<1 || this.state.locations<1 || this.state.beverage==='' || this.state.status===''){
             this.showAlert();
         }else{
-            let stateValue= '';
+            var stateValue= '';
             switch(this.state.status){
                 case 0:
                 stateValue = "Active" 
@@ -268,49 +280,203 @@ class Submition extends Component {
             }
             cookies.set('completeData',dataValue,{path:'/'})
 
-             /* API request start*/
-             let bodyFormData = new FormData();
-                bodyFormData.append('UserId',userInfo.id);
-                bodyFormData.append('UserName',initialForm.firstName+' '+initialForm.lastName);
-                bodyFormData.append('Beverage',this.state.beverage);
-                bodyFormData.append('Location',initialForm.location);
-                bodyFormData.append('PreferredLocations',this.state.locations);
-                bodyFormData.append('Roles',firstForm.Roles);
-                bodyFormData.append('SocialLinks',this.state.urls);            
-                bodyFormData.append('SubRoles',firstForm.SubRoles);
-                bodyFormData.append('Technologies',firstForm.Technologies);
-                bodyFormData.append('Skypename','');
-                bodyFormData.append('Phone','');
-                axios({
-                    method: 'post',
-                    url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserUpdateProfile',
-                    data: bodyFormData,
-                    async:true,
-                    config: { headers: {'Content-Type': 'multipart/form-data' }}
-                    })
-                    .then((response) => {
-                        let data = {
-                            id:userInfo.id,
-                            fullName:initialForm.firstName+' '+initialForm.lastName,
-                            email:userInfo.email,
-                            location:initialForm.location,
-                            locations:this.state.locations,
-                            roles:firstForm.Roles,
-                            technologies:firstForm.Technologies,
-                            subRoles:firstForm.SubRoles,
-                            beverage:this.state.beverage,
-                            socialMedia:this.state.urls,
-                            jobSeekingStatus:"active",
-                        }
-                        this.props.actions.storeUserProfile(data,"STORE_USER_PROFILE")
-                        if(response.data.data[0].ret==true){
-                            browserHistory.push('/profile/talent/candidate');
-                        }
-                    }).catch((err) => {
-                        console.log(err)                       
-                    });
-             /* API Request End */    
+        /* Get Access Token */
 
+            // var settings = {
+            //     "async": true,
+            //     "crossDomain": true,
+            //     "method": "POST",
+            //     "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+            //     "headers": {
+            //       "cache-control": "no-cache",
+            //     },
+            //     "data": {
+            //       "username": "bjorn@adveniopeople.com",
+            //       "password": "Cyclops2+",
+            //       "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+            //       "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+            //       "grant_type": "password",
+            //       "scope": "openid profile api email"
+            //     }
+            //   }
+            //   $.ajax(settings).done( (response) => {
+            //    sessionStorage.setItem('AccessTokenInv',response.access_token); 
+            //    updateInveniasField()
+            //   })
+            //   .fail(function (jqXHR, textStatus) {
+            //     // this.setState({
+            //     //     isLoading:false
+            //     // });
+            // });
+           
+            /* Get Access Token */
+        
+        /* Update Candidate */
+    //    function updateInveniasField(){
+           var socialLinks = this.state.urls;
+           var facebook = "";
+           var google = "";
+           var github = "";
+           var linkedin = "";
+           var behance = "";
+           if(socialLinks.length>0){
+            for(var i=0; i < socialLinks.length; i++){
+                if(socialLinks[i].includes("facebook")){
+                    facebook =socialLinks[i];
+                }
+                if(socialLinks[i].includes("google")){
+                    google = socialLinks[i];
+                }
+                if(socialLinks[i].includes("linkedin")){
+                    linkedin = socialLinks[i];
+                }
+                if(socialLinks[i].includes("github")){
+                    github = socialLinks[i];
+                }
+                if(socialLinks[i].includes("behance")){
+                    behance = socialLinks[i];
+                }
+            }
+           }
+           var locations = "";
+           var beverates = "";
+           var roles = "";
+           var subRoles = "";
+           var techs = "";
+           this.state.locations.map(data =>{
+            console.log(data)
+           })
+           var data = {
+            "NameComponents": {
+                "FullName": firstForm.firstName+ " " +firstForm.lastName,
+                "FamilyName": firstForm.lastName,
+                "FirstName": firstForm.firstName,
+                "Suffix": firstForm.lastName,
+              },
+                "HomeAddress": {
+                  "TownCity": initialForm.location,
+                },
+                 "CandidateStatus": {
+                  "FieldName": "CandidateStatus",
+                  "DisplayTitle": "Candidate Status",
+                  "ItemValue": stateValue
+                },
+                  "CustomFreeTextFields": [
+                    {
+                        "FieldName": "PersonCustom4",
+                        "DisplayTitle": "Preferred location",
+                        "ItemDisplayText": this.state.locations.toString(),
+                        "ItemValue": this.state.locations.toString()
+                    },
+                    {
+                        "FieldName": "PersonCustom5",
+                        "DisplayTitle": "Preferred coffee",
+                        "ItemDisplayText": this.state.beverage.toString(),
+                        "ItemValue":this.state.beverage.toString()
+                    }
+                  ],
+                 "CustomReferenceFields": [
+                  {
+                     "FieldName": "PersonCustom1",
+                     "DisplayTitle": "Area of expertise",
+                     "ItemValue": firstForm.Roles.toString()
+                  },
+                  {
+                    "FieldName": "PersonCustom2",
+                     "DisplayTitle": "Preferred Title",
+                     "ItemValue": firstForm.SubRoles.toString()
+                  },
+                  {
+                    "FieldName": "PersonCustom3",
+                     "DisplayTitle": "Preferred technology or Expertise",
+                     "ItemValue": firstForm.Technologies.toString()
+                  }
+                ],
+                "Websites": [
+                  {
+                    "FieldName": "LinkedIn",
+                    "DisplayTitle": "LinkedIn",
+                    "ItemValue": linkedin
+                  },
+                  {
+                    "FieldName": "Facebook",
+                    "DisplayTitle": "Facebook",
+                    "ItemValue": facebook
+                  },
+                  {
+                  "FieldName": "Skype",
+                  "DisplayTitle": "Skype",
+                    "ItemValue": ""
+                  }
+                ],
+              }
+              
+              axios({
+                method: 'put',
+                url: 'https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/api/v1/people/'+cookies.get('inveniasId'),
+                data: data,
+                headers: {'Authorization':'Bearer '+sessionStorage.getItem('AccessToken') }
+                })
+                .then((response) => {
+                updateUserProfile();
+                }).catch((err) => {
+                    console.log(err)
+                });
+        //    }
+
+       
+    //    }
+        /* Update Candidate */
+        function updateUserProfile(){
+            var propsData = this.props;
+        /* API request start*/
+        firstForm = cookies.get('firstForm');
+        userInfo = cookies.get('userInfo');
+        initialForm = cookies.get('initialForm');
+        let bodyFormData = new FormData();
+        bodyFormData.append('UserId',userInfo.id);
+        bodyFormData.append('UserName',initialForm.firstName+' '+initialForm.lastName);
+        bodyFormData.append('Beverage',this.state.beverage);
+        bodyFormData.append('Location',initialForm.location);
+        bodyFormData.append('PreferredLocations',this.state.locations);
+        bodyFormData.append('Roles',firstForm.Roles);
+        bodyFormData.append('SocialLinks',this.state.urls);            
+        bodyFormData.append('SubRoles',firstForm.SubRoles);
+        bodyFormData.append('Technologies',firstForm.Technologies);
+        bodyFormData.append('Skypename','');
+        bodyFormData.append('Phone','');
+        bodyFormData.append('ProfileStatus',stateValue);
+        axios({
+            method: 'post',
+            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserUpdateProfile',
+            data: bodyFormData,
+            async:true,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+            })
+            .then((response) => {
+                let data = {
+                    id:userInfo.id,
+                    fullName:initialForm.firstName+' '+initialForm.lastName,
+                    email:userInfo.email,
+                    location:initialForm.location,
+                    locations:this.state.locations,
+                    roles:firstForm.Roles,
+                    technologies:firstForm.Technologies,
+                    subRoles:firstForm.SubRoles,
+                    beverage:this.state.beverage,
+                    socialMedia:this.state.urls,
+                    status:stateValue,
+                }
+                propsData.actions.storeUserProfile(data,"STORE_USER_PROFILE")
+                if(response.data.data[0].ret==true){
+                    browserHistory.push('/profile/talent/candidate');
+                }
+            }).catch((err) => {
+                console.log(err)                       
+            });
+        /* API Request End */    
+            
+        }
 
             /* Invenias request start*/
             // let bodyFormData = new FormData();
@@ -345,8 +511,8 @@ class Submition extends Component {
         //         this.setState({ isLoading: false });
         //         this.showAlert();
         //     }) : browserHistory.push(path)
+    
     }
-
     alertOptions = {
         offset: 14,
         position: 'bottom right',

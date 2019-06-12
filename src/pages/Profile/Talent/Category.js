@@ -68,12 +68,14 @@ class Category extends Component {
         }
     }
 
-    componentWillMount(){        
+    componentWillMount(){      
+
         if(!cookies.get('isLoggedIn')){
             browserHistory.push('/signin/talent');
         }
         autoScrolling()   
         let temp = {}   
+
         if(this.props.subRoles){
             this.props.subRoles.map(subRole => {                 
                 let tempSubRole
