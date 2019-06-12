@@ -208,6 +208,7 @@ class SignIn extends Component {
                             var newFormData = new FormData();
                             newFormData.append('UserId',userData.id);
                             newFormData.append('InveniasId',InveniasId);
+                            cookies.set('inveniasId',InveniasId,{path:"/"})
                                 axios({
                                 method: 'post',
                                 url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
@@ -497,7 +498,7 @@ class SignIn extends Component {
                 var newFormData = new FormData();
                 newFormData.append('UserId',userData.id);
                 newFormData.append('InveniasId',InveniasId);
-                cookies.set('inveniasIs',InveniasId,{path:"/"})
+                cookies.set('inveniasId',InveniasId,{path:"/"})
                     axios({
                     method: 'post',
                     url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UpdateInveniasIdByUserId',
