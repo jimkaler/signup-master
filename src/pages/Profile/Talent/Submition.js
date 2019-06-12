@@ -424,6 +424,7 @@ class Submition extends Component {
                 updateUserProfile();
                 }).catch((err) => {
                     console.log(err)
+                    updateUserProfile();
                 });
         //    }
 
