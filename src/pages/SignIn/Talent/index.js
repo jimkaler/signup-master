@@ -88,6 +88,33 @@ class SignIn extends Component {
              browserHistory.push('/profile/talent/person');
         }
 
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
+            "method": "POST",
+            "headers": {
+              "cache-control": "no-cache",
+            },
+            "data": {
+              "username": "bjorn@adveniopeople.com",
+              "password": "Cyclops2+",
+              "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
+              "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
+              "grant_type": "password",
+              "scope": "openid profile api email"
+            }
+          }
+          $.ajax(settings).done(function (response) {
+           sessionStorage.setItem('AccessToken',response.access_token); 
+
+          })
+          .fail(function (jqXHR, textStatus) {
+            this.setState({
+                isLoading:false
+            });
+        });
+
         cookies.set('authType', 'talent', { path: '/' },expires,expires);
     }
 
@@ -178,6 +205,7 @@ class SignIn extends Component {
                         });
                         /* Get Access Token */
                     }else{
+                        cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
                         cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                         browserHistory.push('/profile/talent/person');
                     }    
@@ -414,6 +442,7 @@ class SignIn extends Component {
                             cookies.set('userInfo',uData,{path  :'/',expires:expires});
                             getToken();
                         }else{  
+                            cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                             browserHistory.push('/profile/talent/person');

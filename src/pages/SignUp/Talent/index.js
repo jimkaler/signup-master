@@ -100,16 +100,6 @@ class SignUp extends Component {
             console.log("LoggedIn Enabled True? "+cookies.get('isLoggedIn'))
              browserHistory.push('/profile/talent/person');
         }
-
-        cookies.set('authType', 'talent', { path: '/' ,expires:expires});
-    }
-
-    componentDidMount() {
-        if (!this.props.hasExternalLogins) {
-            // Request external login providers
-            this.props.actions.getExternalLogins();
-            // this.props.dispatch(getExternalLogins());
-        }
         var settings = {
             "async": true,
             "crossDomain": true,
@@ -136,6 +126,17 @@ class SignUp extends Component {
                 isLoading:false
             });
         });
+
+        cookies.set('authType', 'talent', { path: '/' ,expires:expires});
+    }
+
+    componentDidMount() {
+        if (!this.props.hasExternalLogins) {
+            // Request external login providers
+            this.props.actions.getExternalLogins();
+            // this.props.dispatch(getExternalLogins());
+        }
+       
     }
 
 
@@ -194,6 +195,7 @@ responseGoogle = (response) => {
                             var userInfo = cookies.get('userInfo')
                             userInfo.id = response.data.data[0].Id;
                             cookies.set('userInfo',userInfo,{path:'/',expires:expires})
+                            
                             if(response.data.data[0].InveniasId==null || response.data.data[0].InveniasId==''){
                                 /* Get Access Token */
                                 var settings = {
@@ -224,6 +226,7 @@ responseGoogle = (response) => {
                                 
                         }else{
                             // getUserInfo(response.data.data[0].Id)
+                            cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                             browserHistory.push('/profile/talent/person');
                         }    
@@ -619,10 +622,12 @@ responseGoogle = (response) => {
                     .then((response) => {
                         var uData = cookies.get('userInfo');
                         uData.id = response.data.data[0].Id;
+                        
                         if(response.data.data[0].Id=='' || response.data.data[0].Id==null){
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
                             getToken();
                         }else{
+                            cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
                             cookies.set('userInfo',uData,{path:'/',expires:expires});
                             cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                             browserHistory.push('/profile/talent/person');

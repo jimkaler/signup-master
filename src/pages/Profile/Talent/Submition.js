@@ -104,16 +104,19 @@ class Submition extends Component {
     }
     componentDidMount(){
         var userInfo = cookies.get('userInfo');
-        axios({
-            method: 'get',
-            url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/GetUserDetailById?UserId='+userInfo.id,
-            })
-            .then((response) => {
-                cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
-            console.log(response.data.data[0].InveniasId)
-            }).catch((err) => {
-                console.log(err)
-            });
+        if(userInfo){
+
+            axios({
+                method: 'get',
+                url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/GetUserDetailById?UserId='+userInfo.id,
+                })
+                .then((response) => {
+                    cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
+                console.log(response.data.data[0].InveniasId)
+                }).catch((err) => {
+                    console.log(err)
+                });
+        }
     }
     addTag = (text) => {      
         text = text.replace(/[\W_]+/g," "); 
@@ -151,7 +154,7 @@ class Submition extends Component {
         if(e.keyCode === 13 && e.target.value) {                        
             this.addTag(e.target.value)  
             this.setState({ location: '', enableAdd: false, isHighlight: false })
-            e.target.value = ''              
+             e.target.value = ''              
         }
         if(e.keyCode === 40 && location.length >= 3){            
             cities.map(city => {
@@ -235,6 +238,7 @@ class Submition extends Component {
         browserHistory.push(path)
     }
 
+
     nextPageNavigation = (path) => {
         const obj = { 
             ProfileId: this.props.profileId,           
@@ -252,7 +256,7 @@ class Submition extends Component {
                 stateValue = "Active" 
                 break;
                 case 1:
-                stateValue = "Pasive"
+                stateValue = "Passive"
                 break;
                 case 2: 
                 stateValue = "It's complicated"
@@ -279,47 +283,18 @@ class Submition extends Component {
                 Status: stateValue
             }
             cookies.set('completeData',dataValue,{path:'/'})
-
-        /* Get Access Token */
-
-            // var settings = {
-            //     "async": true,
-            //     "crossDomain": true,
-            //     "method": "POST",
-            //     "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
-            //     "headers": {
-            //       "cache-control": "no-cache",
-            //     },
-            //     "data": {
-            //       "username": "bjorn@adveniopeople.com",
-            //       "password": "Cyclops2+",
-            //       "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
-            //       "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
-            //       "grant_type": "password",
-            //       "scope": "openid profile api email"
-            //     }
-            //   }
-            //   $.ajax(settings).done( (response) => {
-            //    sessionStorage.setItem('AccessTokenInv',response.access_token); 
-            //    updateInveniasField()
-            //   })
-            //   .fail(function (jqXHR, textStatus) {
-            //     // this.setState({
-            //     //     isLoading:false
-            //     // });
-            // });
-           
-            /* Get Access Token */
-        
         /* Update Candidate */
     //    function updateInveniasField(){
            var socialLinks = this.state.urls;
+           var socialLinks1 = this.state.urls;
            var facebook = "";
            var google = "";
            var github = "";
            var linkedin = "";
            var behance = "";
-           if(socialLinks.length>0){
+           
+           
+           if(socialLinks){
             for(var i=0; i < socialLinks.length; i++){
                 if(socialLinks[i].includes("facebook")){
                     facebook =socialLinks[i];
@@ -338,41 +313,42 @@ class Submition extends Component {
                 }
             }
            }
-           var locations = "";
-           var beverates = "";
-           var roles = "";
-           var subRoles = "";
-           var techs = "";
-           this.state.locations.map(data =>{
-            console.log(data)
-           })
+
+           var locations = this.state.locations.toString();
+           var beverages = this.state.beverage.toString();
+           var locations1 = this.state.locations;
+           var beverages1 = this.state.beverage;
+           var roles = firstForm.Roles.toString();
+           var subRoles = firstForm.SubRoles.toString();
+           var techs = firstForm.Technologies.toString();
            var data = {
             "NameComponents": {
-                "FullName": firstForm.firstName+ " " +firstForm.lastName,
-                "FamilyName": firstForm.lastName,
-                "FirstName": firstForm.firstName,
-                "Suffix": firstForm.lastName,
+                "FullName": initialForm.firstName+ " " +initialForm.lastName,
+                "FamilyName": initialForm.lastName,
+                "FirstName": initialForm.firstName,
+                "Suffix": initialForm.lastName,
               },
                 "HomeAddress": {
                   "TownCity": initialForm.location,
                 },
                  "CandidateStatus": {
-                  "FieldName": "CandidateStatus",
-                  "DisplayTitle": "Candidate Status",
-                  "ItemValue": stateValue
+                    "ItemDisplayText": stateValue,
+                    "FieldName": "CandidateStatus",
+                    "DisplayTitle": "CandidateStatus",
+                    "ItemValue": stateValue
                 },
                   "CustomFreeTextFields": [
                     {
                         "FieldName": "PersonCustom4",
                         "DisplayTitle": "Preferred location",
-                        "ItemDisplayText": this.state.locations.toString(),
-                        "ItemValue": this.state.locations.toString()
+                        "ItemDisplayText": locations,
+                        "ItemValue": locations
                     },
                     {
                         "FieldName": "PersonCustom5",
                         "DisplayTitle": "Preferred coffee",
-                        "ItemDisplayText": this.state.beverage.toString(),
-                        "ItemValue":this.state.beverage.toString()
+                        "ItemDisplayText": beverages,
+                        "ItemValue":beverages
                     }
                   ],
                  "CustomReferenceFields": [
@@ -380,19 +356,19 @@ class Submition extends Component {
                      "Id": "8bdbeea3-fa8b-416b-94ea-b6ce2f420ec7",
                      "FieldName": "PersonCustom1",
                      "DisplayTitle": "Area of expertise",
-                     "ItemValue": firstForm.Roles.toString()
+                     "ItemValue": roles
                   },
                   {
                     "Id": "17b4599a-7aa6-4291-9459-6022abb6ba0f",
                     "FieldName": "PersonCustom2",
                      "DisplayTitle": "Preferred Title",
-                     "ItemValue": firstForm.SubRoles.toString()
+                     "ItemValue": subRoles
                   },
                   {
                     "Id": "3f0111df-0d90-4a4d-92ae-080ade774e6a",
                     "FieldName": "PersonCustom3",
                      "DisplayTitle": "Preferred technology or Expertise",
-                     "ItemValue": firstForm.Technologies.toString()
+                     "ItemValue": techs
                   }
                 ],
                 "Websites": [
@@ -431,25 +407,27 @@ class Submition extends Component {
        
     //    }
         /* Update Candidate */
-        function updateUserProfile(){
-            var propsData = this.props;
-        /* API request start*/
+        var self = this.props.actions;
         firstForm = cookies.get('firstForm');
         userInfo = cookies.get('userInfo');
         initialForm = cookies.get('initialForm');
         let bodyFormData = new FormData();
         bodyFormData.append('UserId',userInfo.id);
         bodyFormData.append('UserName',initialForm.firstName+' '+initialForm.lastName);
-        bodyFormData.append('Beverage',this.state.beverage);
+        bodyFormData.append('Beverage',beverages1);
         bodyFormData.append('Location',initialForm.location);
-        bodyFormData.append('PreferredLocations',this.state.locations);
+        bodyFormData.append('PreferredLocations',locations1);
         bodyFormData.append('Roles',firstForm.Roles);
-        bodyFormData.append('SocialLinks',this.state.urls);            
+        bodyFormData.append('SocialLinks',socialLinks1);            
         bodyFormData.append('SubRoles',firstForm.SubRoles);
         bodyFormData.append('Technologies',firstForm.Technologies);
         bodyFormData.append('Skypename','');
         bodyFormData.append('Phone','');
         bodyFormData.append('ProfileStatus',stateValue);
+        function updateUserProfile(){
+
+        /* API request start*/
+
         axios({
             method: 'post',
             url: 'https://cors-anywhere.herokuapp.com/'+urls.API_HOST+'/UserUpdateProfile',
@@ -463,17 +441,19 @@ class Submition extends Component {
                     fullName:initialForm.firstName+' '+initialForm.lastName,
                     email:userInfo.email,
                     location:initialForm.location,
-                    locations:this.state.locations,
+                    locations:locations1,
                     roles:firstForm.Roles,
                     technologies:firstForm.Technologies,
                     subRoles:firstForm.SubRoles,
-                    beverage:this.state.beverage,
-                    socialMedia:this.state.urls,
+                    beverage:beverages1,
+                    socialMedia:socialLinks1,
                     status:stateValue,
                 }
-                propsData.actions.storeUserProfile(data,"STORE_USER_PROFILE")
+                
                 if(response.data.data[0].ret==true){
+                    self.storeUserProfile(data,"STORE_USER_PROFILE");
                     browserHistory.push('/profile/talent/candidate');
+
                 }
             }).catch((err) => {
                 console.log(err)                       
