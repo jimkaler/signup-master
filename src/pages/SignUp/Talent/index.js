@@ -390,43 +390,6 @@ responseGoogle = (response) => {
         name = name.split(' ');
         var fname = name[0];
         var lname = name[1];
-                    /* Get Access Token */
-                    var settings = {
-                        "async": true,
-                        "crossDomain": true,
-                        "url": "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
-                        "method": "POST",
-                        "headers": {
-                          "cache-control": "no-cache",
-                        },
-                        "data": {
-                          "username": "bjorn@adveniopeople.com",
-                          "password": "Cyclops2+",
-                          "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
-                          "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
-                          "grant_type": "password",
-                          "scope": "openid profile api email"
-                        }
-                      }
-
-                      $.ajax({
-                        async: true,
-                        crossDomain: true,
-                        url: "https://cors-anywhere.herokuapp.com/https://adveniopeople.invenias.com/identity/connect/token",
-                        method: "POST",
-                        headers: {
-                            "cache-control": "no-cache",
-                        },
-                        data: {
-                            "username": "bjorn@adveniopeople.com",
-                            "password": "Cyclops2+",
-                            "client_id": "6dc6aa49-1278-438b-a429-cc711d2a2676",
-                            "client_secret": "5aIu68liL3sZ1P5Ph+rFsQ8TL",
-                            "grant_type": "password",
-                            "scope": "openid profile api email"
-                        },success:function (response) {
-                            sessionStorage.setItem('AccessToken',response.access_token); 
-                            // SaveDataIntoInvenias()
 
                             axios({
                                 method: 'post',
@@ -449,7 +412,6 @@ responseGoogle = (response) => {
                                         .then((response) => {
                                             console.log(response.data.data[0])
                                             if(response.data.data[0].ret===1){
-                                                // UpdateDataToDB(response.data.data[0].UserId,InveniasId);
                                                 var userData = cookies.get('userInfo');
                                                 var newFormData = new FormData();
                                                 newFormData.append('UserId',response.data.data[0].UserId);
@@ -492,13 +454,7 @@ responseGoogle = (response) => {
                                     console.log(err)
                                 });
 
-                          }.bind(this),error: function(err){
-                              console.log(err)
-                          }.bind(this)
-                      })
-                      .fail(function (jqXHR, textStatus) {
-                        console.log(textStatus);
-                    });
+                         
                     /* Get Access Token */
             
                     var InveniasData = {

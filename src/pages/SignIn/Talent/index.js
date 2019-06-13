@@ -297,7 +297,6 @@ class SignIn extends Component {
             })
             .then((response) => {
                 if(response.data.status==='1'){
-                    console.log(response)
                     let name = response.data.data[0].Name.split(' ');
                     let fname = name[0];
                     let lname = name[1]; 
@@ -311,10 +310,10 @@ class SignIn extends Component {
                         name:response.data.data[0].Name,
                         location:response.data.data[0].Location
                     }
-                    console.log(userInfo);
                     this.setState({
                         isLoading:false 
                     })
+                    cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
                     cookies.set('userInfo',userInfo,{path:'/',expires:expires})
                     cookies.set('isLoggedIn',true,{path:'/',expires:expires})
                     // console.log(cookies.get('isLoggedIn'));

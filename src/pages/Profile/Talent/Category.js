@@ -89,10 +89,14 @@ class Category extends Component {
     }
 
     addTag = (text) => {
-        text = text.replace(/[\W_]+/g," ");  
-        let temp = this.state.tags.slice()        
-        temp.push(text)
-        this.setState({ tags: temp })
+        var data = this.state.tags;
+        // if(data==""){
+            text = text.replace(/[\W_]+/g," ");  
+            let temp = this.state.tags.slice()        
+            temp.push(text)
+            this.setState({ tags: temp })
+        // }
+
     }
 
     removeTag = (index) => {
@@ -146,62 +150,171 @@ class Category extends Component {
             type: 'info',
         })
     }
+    techAlert = () => {
+        this.msg.info('only single value is allowd.', {
+            time: 0,
+            type: 'info',
+        })
+    }
 
     getSubRoles = (values) => {
         let subRoles = [];
         let roles = [];
+        let inveniasRoleKeys = "";
+        let inveniasSubRoleKeys = "";
+
         Object.keys(values).forEach((key) => {
             if(key !== 'role' && values[key] === true) {
                 key === 'UX_Designer'
                     ? subRoles.push(('UI/' + key).replace(/_/g, " "))
                     : subRoles.push(key.replace(/_/g, " "))
+                    inveniasRoleKeys = "b1905f13-64b4-41f7-9398-4997c4ea4275";
+                    
             }
         });
         subRoles.forEach((subRole) => {            
             if(this.state.engineering.indexOf(subRole) !== -1){
                 if(roles.indexOf("Engineering") === -1){
                     roles.push("Engineering")
+                    inveniasRoleKeys = "ca99c515-723b-4e2e-8e0e-c8cc641cae2b";
                 }                
             }
             else if(this.state.sales.indexOf(subRole) !== -1){
                 if(roles.indexOf("Sales") === -1){
                     roles.push("Sales")
+                    inveniasRoleKeys = "30e35908-c305-45e5-be33-ab5983de7340";
                 }                
             }
             else if(this.state.product.indexOf(subRole) !== -1){
                 if(roles.indexOf("Product") === -1){
                     roles.push("Product")
+                    inveniasRoleKeys = "bb1993b1-fbd2-4bab-b86a-b8be0070363a";
                 }                
             }
             else if(this.state.marketing.indexOf(subRole) !== -1){
                 if(roles.indexOf("Marketing") === -1){
                     roles.push("Marketing")
+                    inveniasRoleKeys = "4a32cd28-14e7-4124-9d9f-da78b1689155";
                 }                
             }
             else if(this.state.design.indexOf(subRole) !== -1){
                 if(roles.indexOf("Design") === -1){
                     roles.push("Design")
+                    inveniasRoleKeys = "b1905f13-64b4-41f7-9398-4997c4ea4275";
                 }                
             }
             else if(this.state.finance.indexOf(subRole) !== -1){
                 if(roles.indexOf("Finance") === -1){
                     roles.push("Finance")
+                    inveniasRoleKeys = "a14f32ca-3b55-45de-8fd5-dbac3b1befc0";
                 }                
             }
         })
-        const obj = {      
-            ProfileId: this.props.profileId,
-            Roles: roles,
-            SubRoles: subRoles,
-            Technologies: this.state.tags
-        }
-        // this.setState({ isLoading: true })
-        
         if(roles.length<1 || subRoles.length<1){
             this.showAlert();
         }else{
-            cookies.set('firstForm',obj,{path:'/',expires:expires});
-            browserHistory.push('/profile/talent/submition')
+        switch(subRoles[0]){
+            case "Backend Engineer": 
+            inveniasSubRoleKeys="f4309a63-a2f9-42ee-b6ec-7787aa4df09a";
+            break;
+            case "Frontend Engineer": 
+            inveniasSubRoleKeys="c62792a0-f1b0-4170-b107-850f0b443841";
+            break;
+            case "Fullstack Engineer": 
+            inveniasSubRoleKeys="0f1a9104-a1b0-4edb-944d-da91b7b4217c";
+            break;
+            case "Mobile": 
+            inveniasSubRoleKeys="7ceb0e76-734b-4d4c-ba18-142346ddcc7c";
+            break;
+            case "DevOps and Tooling": 
+            inveniasSubRoleKeys="c6a1762c-47e6-449c-a2ce-872fc0d4cef7";
+            break;
+            case "QA": 
+            inveniasSubRoleKeys="fa2005eb-84ee-4fce-bf82-e9a9b235f3c9";
+            break;
+            case "Sales Representative": 
+            inveniasSubRoleKeys="9c3a8136-aa3d-4769-a5ac-e785ba5bd74f";
+            break;
+            case "Account Executive": 
+            inveniasSubRoleKeys="1f1d4c3c-a96e-42bd-ab1f-12fc5d6a5e86";
+            break;
+            case "Sales Manager": 
+            inveniasSubRoleKeys="54a2ec7e-1048-48d6-8541-1468c0264a5f";
+            break;
+            case "Sales Director": 
+            inveniasSubRoleKeys="e40beee7-4bb8-4d0a-a19d-6421368110c8";
+            break;
+            case "Product Analyst": 
+            inveniasSubRoleKeys="c52fa889-7498-4c73-93b4-a82735fd309f";
+            break;
+            case "Product Marketing Manager": 
+            inveniasSubRoleKeys="d1bc1033-8d46-4f58-8315-c64dc866da86";
+            break;
+            case "Product Manager": 
+            inveniasSubRoleKeys="dd1d663a-6b1a-49c3-9350-ef46f304745e";
+            break;
+            case "Product Line Director": 
+            inveniasSubRoleKeys="05857e34-4894-4d8a-9656-7a473a53f7bd";
+            break;
+            case "Growth Hacker": 
+            inveniasSubRoleKeys="ead33e8f-27a1-4ca0-8c57-aca9bc8bd0ee";
+            break;
+            case "Marketing Manager": 
+            inveniasSubRoleKeys="ef2af3fc-3e18-4bc8-a6b4-ff838917c05a";
+            break;
+            case "SEO Manager": 
+            inveniasSubRoleKeys="50e46ce5-7ca8-4bad-902f-0e42c2665c79";
+            break;
+            case "Community Manager": 
+            inveniasSubRoleKeys="f6cd32d2-99b0-45b6-9112-d1b56bf382e1";
+            break;
+            case "Copy": 
+            inveniasSubRoleKeys="379a4768-55bc-42f2-b2c2-915150070228";
+            break;
+            case "UX Researcher": 
+            inveniasSubRoleKeys="8a7cc91a-9f4c-4690-9aa9-6bf2aec23798";
+            break;
+            case "UI Designer": 
+            inveniasSubRoleKeys="34257268-d318-44ad-aed3-813358760262";
+            break;
+            case "UX Designer": 
+            inveniasSubRoleKeys="b9238de3-5e0e-4ab9-8930-6835ce1ea8f0";
+            break;
+            case "Art Director": 
+            inveniasSubRoleKeys="d279f6b3-7240-4003-b3f3-7950261a1e8b";
+            break;
+            case "Digital Designer": 
+            inveniasSubRoleKeys="8ccc02e7-6a00-4a67-a8fb-d404a82ef6a6";
+            break;
+            case "Analyst": 
+            inveniasSubRoleKeys="10c67f2d-34be-4a2b-b777-eaa04c389343";
+            break;
+            case "Accountant": 
+            inveniasSubRoleKeys="164e15ea-6975-4fad-b714-b6bf8a6674cf";
+            break;
+            case "Controller": 
+            inveniasSubRoleKeys="352b792a-b264-44de-a766-79cda8bd0f46";
+            break;
+            case "Finance Manager": 
+            inveniasSubRoleKeys="d69e0e53-e217-4028-b1d7-6a1c86176c14";
+            break;
+            case "CEO": 
+            inveniasSubRoleKeys="88135e08-9686-4cf9-993d-6c42713bc435";
+            break;
+            default:
+            inveniasSubRoleKeys="88135e08-9686-4cf9-993d-6c42713bc435";
+        }
+        console.log(inveniasSubRoleKeys)
+        const obj = {      
+            ProfileId: this.props.profileId,
+            Roles: roles[0],
+            SubRoles: subRoles[0],
+            RoleKey:inveniasRoleKeys,
+            SubRoleKey:inveniasSubRoleKeys,
+            Technologies: this.state.tags
+        }
+        cookies.set('firstForm',obj,{path:'/',expires:expires});
+        browserHistory.push('/profile/talent/submition')
         }        
         const headers = { Authorization: this.props.header };
         
