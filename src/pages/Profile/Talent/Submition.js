@@ -112,7 +112,6 @@ class Submition extends Component {
                 })
                 .then((response) => {
                     cookies.set('inveniasId',response.data.data[0].InveniasId,{path:"/"})
-                console.log(response.data.data[0].InveniasId)
                 }).catch((err) => {
                     console.log(err)
                 });
@@ -386,6 +385,7 @@ class Submition extends Component {
                     "ItemValue": ""
                   }
                 ],
+                "IsCandidate": true
               }
               
               axios({

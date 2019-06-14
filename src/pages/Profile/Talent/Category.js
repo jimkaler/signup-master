@@ -162,14 +162,12 @@ class Category extends Component {
         let roles = [];
         let inveniasRoleKeys = "";
         let inveniasSubRoleKeys = "";
-
         Object.keys(values).forEach((key) => {
             if(key !== 'role' && values[key] === true) {
                 key === 'UX_Designer'
                     ? subRoles.push(('UI/' + key).replace(/_/g, " "))
                     : subRoles.push(key.replace(/_/g, " "))
                     inveniasRoleKeys = "b1905f13-64b4-41f7-9398-4997c4ea4275";
-                    
             }
         });
         subRoles.forEach((subRole) => {            
@@ -210,9 +208,21 @@ class Category extends Component {
                 }                
             }
         })
-        if(roles.length<1 || subRoles.length<1){
-            this.showAlert();
+        if(values.role!=="Other"){
+            if(subRoles.length<1){
+                this.showAlert();
+                return false
+            }
         }else{
+            subRoles.push("Other");
+            roles.push('Other')
+            inveniasRoleKeys = "2137a4fc-0df6-4a59-b443-758fc0f3b8ed";
+        }
+        if(values.role===""){
+            this.showAlert();
+            return false
+        }
+        // else{
         switch(subRoles[0]){
             case "Backend Engineer": 
             inveniasSubRoleKeys="f4309a63-a2f9-42ee-b6ec-7787aa4df09a";
@@ -302,9 +312,9 @@ class Category extends Component {
             inveniasSubRoleKeys="88135e08-9686-4cf9-993d-6c42713bc435";
             break;
             default:
-            inveniasSubRoleKeys="88135e08-9686-4cf9-993d-6c42713bc435";
+            inveniasSubRoleKeys="0b455f06-2c0c-4cb8-ac5e-56fed1b74ef5";
+            break;
         }
-        console.log(inveniasSubRoleKeys)
         const obj = {      
             ProfileId: this.props.profileId,
             Roles: roles[0],
@@ -315,7 +325,7 @@ class Category extends Component {
         }
         cookies.set('firstForm',obj,{path:'/',expires:expires});
         browserHistory.push('/profile/talent/submition')
-        }        
+        // }        
         const headers = { Authorization: this.props.header };
         
         
