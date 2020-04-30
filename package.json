@@ -6,7 +6,7 @@
     "@zalando/oauth2-client-js": "0.0.18",
     "axios": "^0.18.0",
     "detect-browser": "^2.0.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "mapbox-gl": "^0.41.0",
     "material-ui": "^0.19.2",
     "mixpanel-browser": "^2.13.0",
